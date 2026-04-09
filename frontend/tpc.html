@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Grotesk:wght@300;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#00a572",
+                    "on-tertiary-fixed": "#301400",
+                    "tertiary-fixed-dim": "#ffb783",
+                    "background": "#0e1322",
+                    "surface-container": "#1a1f2f",
+                    "error-container": "#93000a",
+                    "primary": "#c0c1ff",
+                    "surface-container-low": "#161b2b",
+                    "surface-dim": "#0e1322",
+                    "on-surface": "#dee1f7",
+                    "on-primary-fixed": "#07006c",
+                    "secondary-fixed": "#6ffbbe",
+                    "tertiary-container": "#d97721",
+                    "outline-variant": "#464554",
+                    "on-background": "#dee1f7",
+                    "tertiary-fixed": "#ffdcc5",
+                    "on-secondary-fixed-variant": "#005236",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-secondary-fixed": "#002113",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#452000",
+                    "on-tertiary-fixed-variant": "#703700",
+                    "inverse-primary": "#494bd6",
+                    "surface-container-highest": "#2f3445",
+                    "surface-tint": "#c0c1ff",
+                    "primary-container": "#8083ff",
+                    "inverse-on-surface": "#2b3040",
+                    "on-secondary": "#003824",
+                    "primary-fixed": "#e1e0ff",
+                    "surface-container-high": "#25293a",
+                    "secondary": "#4edea3",
+                    "on-primary-container": "#0d0096",
+                    "primary-fixed-dim": "#c0c1ff",
+                    "inverse-surface": "#dee1f7",
+                    "on-tertiary": "#4f2500",
+                    "on-primary": "#1000a9",
+                    "on-secondary-container": "#00311f",
+                    "surface-bright": "#343949",
+                    "on-primary-fixed-variant": "#2f2ebe",
+                    "tertiary": "#ffb783",
+                    "on-error": "#690005",
+                    "surface-variant": "#2f3445",
+                    "outline": "#908fa0",
+                    "on-surface-variant": "#c7c4d7",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-lowest": "#090e1c",
+                    "surface": "#0e1322"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0e1322;
+            background-image: radial-gradient(rgba(192, 193, 255, 0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(47, 52, 69, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 193, 255, 0.1);
+        }
+        .neural-wave {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .wave-bar {
+            width: 3px;
+            height: 12px;
+            background: #c0c1ff;
+            border-radius: 1px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0e1322;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #25293a;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface selection:bg-primary selection:text-on-primary">
+<!-- Shared SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 border-r border-[#25293a] bg-[#0e1322] flex flex-col py-8 px-4 z-50">
+<div class="mb-12 px-4">
+<h1 class="text-2xl font-black tracking-tighter text-[#c0c1ff]">NEXORA</h1>
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary/60 mt-1">Neural Intelligence</p>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Active Tab: Progress/Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#c0c1ff] font-bold border-r-2 border-[#c0c1ff] bg-[#1a1f2f]" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-['Inter'] tracking-tight">Progress</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f]" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] tracking-tight">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f]" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-['Inter'] tracking-tight">My Coach</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f]" href="#">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+<span class="font-['Inter'] tracking-tight">Mock Interview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f]" href="#">
+<span class="material-symbols-outlined" data-icon="alt_route">alt_route</span>
+<span class="font-['Inter'] tracking-tight">My Roadmap</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f]" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Inter'] tracking-tight">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-[#25293a]">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f]" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-['Inter'] tracking-tight">Profile</span>
+</a>
+</div>
+</aside>
+<!-- Shared TopAppBar -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-[#0e1322]/80 backdrop-blur-xl flex justify-end items-center px-8 gap-6 w-full">
+<div class="mr-auto">
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-primary/60">System Status: Optimal</span>
+</div>
+<div class="flex items-center gap-6 text-[#dee1f7]/70 font-['JetBrains_Mono'] text-sm tracking-tight">
+<span class="material-symbols-outlined cursor-pointer hover:text-[#c0c1ff] transition-all" data-icon="timer">timer</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-[#c0c1ff] transition-all" data-icon="workspace_premium">workspace_premium</span>
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full border border-primary/20">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="graphic_eq">graphic_eq</span>
+<span class="text-xs uppercase">Neural Engine Active</span>
+</div>
+<button class="bg-primary text-on-primary px-4 py-1.5 rounded-full font-bold text-xs hover:scale-[1.03] active:scale-[0.97] transition-all">
+                EXPORT REPORT
+            </button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="ml-64 pt-20 p-8 min-h-screen">
+<!-- Header Section -->
+<section class="mb-10 flex justify-between items-end">
+<div class="max-w-2xl">
+<h2 class="text-5xl font-black tracking-tighter text-on-surface mb-2 font-headline uppercase">TPC Admin Hub</h2>
+<p class="font-['JetBrains_Mono'] text-sm text-on-surface-variant">Real-time cohort monitoring &amp; placement risk intelligence.</p>
+</div>
+<div class="flex gap-4">
+<div class="glass-panel px-6 py-3 rounded-xl text-center">
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase text-primary/60 tracking-widest mb-1">Live Placement Rate</p>
+<p class="text-2xl font-black text-secondary">84.2%</p>
+</div>
+</div>
+</section>
+<!-- Bento Grid Analytics -->
+<section class="grid grid-cols-12 gap-6 mb-12">
+<!-- Heatmap Card (Batch Readiness) -->
+<div class="col-span-8 surface-container-low p-6 rounded-xl border border-primary/10 relative overflow-hidden">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-['JetBrains_Mono'] text-xs uppercase tracking-[0.2em] text-primary">Batch Readiness Matrix</h3>
+<span class="material-symbols-outlined text-primary/40" data-icon="query_stats">query_stats</span>
+</div>
+<div class="grid grid-cols-12 gap-2">
+<!-- Heatmap simulated grid -->
+<div class="col-span-12 grid grid-cols-24 gap-1">
+<!-- Generative loop for heatmap dots -->
+<div class="h-6 w-full rounded-sm bg-secondary opacity-20"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-40"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-80"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-100"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-60"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-30"></div>
+<div class="h-6 w-full rounded-sm bg-tertiary opacity-40"></div>
+<div class="h-6 w-full rounded-sm bg-tertiary opacity-80"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-90"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-100"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-40"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-10"></div>
+<!-- ... repeated visual structure ... -->
+<div class="h-6 w-full rounded-sm bg-error opacity-40"></div>
+<div class="h-6 w-full rounded-sm bg-error opacity-70"></div>
+<div class="h-6 w-full rounded-sm bg-error opacity-90"></div>
+<div class="h-6 w-full rounded-sm bg-tertiary opacity-50"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-100"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-100"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-80"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-60"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-40"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-20"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-10"></div>
+<div class="h-6 w-full rounded-sm bg-secondary opacity-5"></div>
+</div>
+<!-- Legend -->
+<div class="col-span-12 flex justify-end gap-4 mt-4 font-['JetBrains_Mono'] text-[9px] uppercase text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-error"></span> Critical</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary"></span> Moderate</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> Ready</span>
+</div>
+</div>
+</div>
+<!-- Company Match Rate -->
+<div class="col-span-4 surface-container-high p-6 rounded-xl border border-primary/10 flex flex-col justify-between">
+<div>
+<h3 class="font-['JetBrains_Mono'] text-xs uppercase tracking-[0.2em] text-primary mb-1">Company Match Rate</h3>
+<p class="text-4xl font-black font-headline tracking-tighter">72<span class="text-primary">%</span></p>
+</div>
+<div class="mt-6 space-y-3">
+<div class="flex justify-between items-center text-[10px] font-['JetBrains_Mono'] uppercase">
+<span>FAANG Tech</span>
+<span class="text-secondary">42%</span>
+</div>
+<div class="h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[42%]"></div>
+</div>
+<div class="flex justify-between items-center text-[10px] font-['JetBrains_Mono'] uppercase mt-2">
+<span>Fintech / Web3</span>
+<span class="text-primary">88%</span>
+</div>
+<div class="h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[88%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Dashboard View -->
+<div class="flex gap-8">
+<!-- Table Section (Dense View) -->
+<div class="flex-1">
+<div class="surface-container rounded-xl overflow-hidden border border-white/5">
+<div class="p-6 border-b border-white/5 flex justify-between items-center">
+<div class="flex items-center gap-4">
+<h4 class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-on-surface">Student Risk Audit</h4>
+<div class="flex items-center gap-2 px-3 py-1 bg-background rounded-md border border-outline-variant">
+<span class="material-symbols-outlined text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-[10px] font-['JetBrains_Mono'] p-0 w-32 uppercase placeholder:text-outline" placeholder="FILTER COHORT..." type="text"/>
+</div>
+</div>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low font-['JetBrains_Mono'] text-[10px] uppercase text-primary/60 tracking-widest">
+<th class="px-6 py-4">Student</th>
+<th class="px-6 py-4">Batch ID</th>
+<th class="px-6 py-4">Mock Score</th>
+<th class="px-6 py-4">Engagement</th>
+<th class="px-6 py-4">Placement Risk</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 1 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+</div>
+<div>
+<p class="font-bold text-sm tracking-tight">Arjun Mehta</p>
+<p class="text-[10px] font-['JetBrains_Mono'] text-on-surface-variant">Full Stack B24</p>
+</div>
+</td>
+<td class="px-6 py-4 font-['JetBrains_Mono'] text-xs">#FS-X92</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold">92</span>
+<div class="neural-wave"><div class="wave-bar bg-secondary"></div><div class="wave-bar bg-secondary h-4"></div><div class="wave-bar bg-secondary h-2"></div></div>
+</div>
+</td>
+<td class="px-6 py-4 text-xs">98%</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary text-[9px] font-black uppercase tracking-tighter">LOW RISK</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-all text-lg" data-icon="more_vert">more_vert</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+</div>
+<div>
+<p class="font-bold text-sm tracking-tight">Sarah Jenkins</p>
+<p class="text-[10px] font-['JetBrains_Mono'] text-on-surface-variant">Data Sci D01</p>
+</div>
+</td>
+<td class="px-6 py-4 font-['JetBrains_Mono'] text-xs">#DS-A11</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold">54</span>
+<div class="neural-wave"><div class="wave-bar bg-error h-2"></div><div class="wave-bar bg-error h-3"></div><div class="wave-bar bg-error h-1"></div></div>
+</div>
+</td>
+<td class="px-6 py-4 text-xs">62%</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-error-container/20 text-error text-[9px] font-black uppercase tracking-tighter">CRITICAL</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-all text-lg" data-icon="more_vert">more_vert</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+</div>
+<div>
+<p class="font-bold text-sm tracking-tight">Kevin Thorne</p>
+<p class="text-[10px] font-['JetBrains_Mono'] text-on-surface-variant">Cloud Eng C04</p>
+</div>
+</td>
+<td class="px-6 py-4 font-['JetBrains_Mono'] text-xs">#CE-P04</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold">78</span>
+<div class="neural-wave"><div class="wave-bar bg-tertiary h-3"></div><div class="wave-bar bg-tertiary h-4"></div><div class="wave-bar bg-tertiary h-3"></div></div>
+</div>
+</td>
+<td class="px-6 py-4 text-xs">81%</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary text-[9px] font-black uppercase tracking-tighter">MODERATE</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-all text-lg" data-icon="more_vert">more_vert</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+</div>
+<div>
+<p class="font-bold text-sm tracking-tight">Li Wei</p>
+<p class="text-[10px] font-['JetBrains_Mono'] text-on-surface-variant">ML Systems M02</p>
+</div>
+</td>
+<td class="px-6 py-4 font-['JetBrains_Mono'] text-xs">#ML-Z02</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold">85</span>
+<div class="neural-wave"><div class="wave-bar bg-secondary h-4"></div><div class="wave-bar bg-secondary h-3"></div><div class="wave-bar bg-secondary h-4"></div></div>
+</div>
+</td>
+<td class="px-6 py-4 text-xs">92%</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary text-[9px] font-black uppercase tracking-tighter">LOW RISK</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-all text-lg" data-icon="more_vert">more_vert</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Alert Panel -->
+<aside class="w-80 space-y-6">
+<div class="surface-container p-6 rounded-xl border border-error/20 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="material-symbols-outlined text-error opacity-50" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h5 class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-error mb-4">Neural Alerts: Critical</h5>
+<div class="space-y-4">
+<!-- Alert Item 1 -->
+<div class="bg-background/40 p-4 rounded-lg border-l-4 border-error">
+<div class="flex justify-between mb-1">
+<span class="font-bold text-sm tracking-tight">Sarah Jenkins</span>
+<span class="text-[9px] font-['JetBrains_Mono'] text-on-surface-variant">2H AGO</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mb-3 leading-relaxed">Missed 3 consecutive mock rounds. Interview readiness score dropped below 55%.</p>
+<button class="w-full py-2 bg-error/10 hover:bg-error/20 text-error text-[10px] font-black uppercase tracking-widest rounded transition-all border border-error/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xs" data-icon="send">send</span> SEND NUDGE
+                            </button>
+</div>
+<!-- Alert Item 2 -->
+<div class="bg-background/40 p-4 rounded-lg border-l-4 border-tertiary">
+<div class="flex justify-between mb-1">
+<span class="font-bold text-sm tracking-tight">David Moss</span>
+<span class="text-[9px] font-['JetBrains_Mono'] text-on-surface-variant">5H AGO</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mb-3 leading-relaxed">Placement match rate for 'FinTech' sector failing due to skill gaps in SQL.</p>
+<button class="w-full py-2 bg-tertiary/10 hover:bg-tertiary/20 text-tertiary text-[10px] font-black uppercase tracking-widest rounded transition-all border border-tertiary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xs" data-icon="send">send</span> SEND NUDGE
+                            </button>
+</div>
+</div>
+<a class="block text-center mt-6 font-['JetBrains_Mono'] text-[9px] uppercase tracking-widest text-primary hover:underline transition-all" href="#">View All Intelligence</a>
+</div>
+<!-- Secondary Context Card -->
+<div class="surface-container p-6 rounded-xl border border-white/5">
+<h5 class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary/60 mb-4">System Recommendations</h5>
+<ul class="space-y-3">
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="lightbulb">lightbulb</span>
+<p class="text-[11px] leading-tight text-on-surface-variant">Initiate 'Deep Mock' for Batch #FS-X92 students with score &lt; 80.</p>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="bolt">bolt</span>
+<p class="text-[11px] leading-tight text-on-surface-variant">Re-allocate Mentor resources to DS-A11 for backend module support.</p>
+</li>
+</ul>
+</div>
+</aside>
+</div>
+</main>
+<!-- Floating Action Button (Only on main dashboard) -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-[0_0_20px_rgba(192,193,255,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add" style="font-variation-settings: 'wght' 700;">add</span>
+</button>
+</div>
+</body></html>

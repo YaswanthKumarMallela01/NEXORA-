@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEXORA AI | Student Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "secondary-container": "#00a572",
+                "on-tertiary-fixed": "#301400",
+                "tertiary-fixed-dim": "#ffb783",
+                "background": "#0e1322",
+                "surface-container": "#1a1f2f",
+                "error-container": "#93000a",
+                "primary": "#c0c1ff",
+                "surface-container-low": "#161b2b",
+                "surface-dim": "#0e1322",
+                "on-surface": "#dee1f7",
+                "on-primary-fixed": "#07006c",
+                "secondary-fixed": "#6ffbbe",
+                "tertiary-container": "#d97721",
+                "outline-variant": "#464554",
+                "on-background": "#dee1f7",
+                "tertiary-fixed": "#ffdcc5",
+                "on-secondary-fixed-variant": "#005236",
+                "secondary-fixed-dim": "#4edea3",
+                "on-secondary-fixed": "#002113",
+                "error": "#ffb4ab",
+                "on-tertiary-container": "#452000",
+                "on-tertiary-fixed-variant": "#703700",
+                "inverse-primary": "#494bd6",
+                "surface-container-highest": "#2f3445",
+                "surface-tint": "#c0c1ff",
+                "primary-container": "#8083ff",
+                "inverse-on-surface": "#2b3040",
+                "on-secondary": "#003824",
+                "primary-fixed": "#e1e0ff",
+                "surface-container-high": "#25293a",
+                "secondary": "#4edea3",
+                "on-primary-container": "#0d0096",
+                "primary-fixed-dim": "#c0c1ff",
+                "inverse-surface": "#dee1f7",
+                "on-tertiary": "#4f2500",
+                "on-primary": "#1000a9",
+                "on-secondary-container": "#00311f",
+                "surface-bright": "#343949",
+                "on-primary-fixed-variant": "#2f2ebe",
+                "tertiary": "#ffb783",
+                "on-error": "#690005",
+                "surface-variant": "#2f3445",
+                "outline": "#908fa0",
+                "on-surface-variant": "#c7c4d7",
+                "on-error-container": "#ffdad6",
+                "surface-container-lowest": "#090e1c",
+                "surface": "#0e1322"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        background-color: #0e1322;
+        background-image: radial-gradient(rgba(192, 193, 255, 0.05) 1px, transparent 0);
+        background-size: 24px 24px;
+      }
+      .neural-glow {
+        box-shadow: 0 0 20px rgba(192, 193, 255, 0.04);
+      }
+      .luminous-border {
+        border: 1px solid rgba(192, 193, 255, 0.2);
+      }
+      .luminous-border:hover {
+        border-color: rgba(192, 193, 255, 0.5);
+      }
+      .waveform-bar {
+        width: 3px;
+        background: #c0c1ff;
+        border-radius: 2px;
+        height: 8px;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant/30 flex flex-col py-8 px-4 bg-[#0e1322] z-50">
+<div class="mb-10 px-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center neural-glow">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h1 class="text-2xl font-black tracking-tighter text-primary leading-none">NEXORA</h1>
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary/60 mt-1">Neural Intelligence</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Active: Home -->
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-primary font-bold border-r-2 border-primary bg-[#1a1f2f] scale-97 active:scale-95" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Home</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface/60 font-medium hover:text-on-surface hover:bg-[#1a1f2f] scale-97 active:scale-95" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">My Coach</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface/60 font-medium hover:text-on-surface hover:bg-[#1a1f2f] scale-97 active:scale-95" href="#">
+<span class="material-symbols-outlined">mic</span>
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Mock Interview</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface/60 font-medium hover:text-on-surface hover:bg-[#1a1f2f] scale-97 active:scale-95" href="#">
+<span class="material-symbols-outlined">alt_route</span>
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">My Roadmap</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface/60 font-medium hover:text-on-surface hover:bg-[#1a1f2f] scale-97 active:scale-95" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Progress</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface/60 font-medium hover:text-on-surface hover:bg-[#1a1f2f] scale-97 active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+<div class="pt-6 mt-6 border-t border-outline-variant/20">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface/60 font-medium hover:text-on-surface hover:bg-[#1a1f2f] scale-97 active:scale-95" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Profile</span>
+</a>
+</div>
+</aside>
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-[#0e1322]/80 backdrop-blur-xl flex justify-end items-center px-8 gap-6 w-[calc(100%-16rem)]">
+<div class="flex items-center gap-8 mr-auto">
+<div class="flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary text-sm">timer</span>
+<span class="font-['JetBrains_Mono'] text-xs font-bold tracking-tight text-on-surface">PLACEMENT IN 47 DAYS</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">workspace_premium</span>
+<span class="font-['JetBrains_Mono'] text-xs font-bold tracking-tight text-on-surface">12 DAY STREAK</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1 group cursor-pointer">
+<div class="waveform-bar h-3 bg-primary"></div>
+<div class="waveform-bar h-5 bg-secondary"></div>
+<div class="waveform-bar h-4 bg-primary"></div>
+<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-tighter ml-2 text-primary/80">Processing Intelligence</span>
+</div>
+<span class="material-symbols-outlined text-on-surface/70 hover:text-primary transition-all cursor-pointer">graphic_eq</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">notifications</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 p-8 min-h-screen">
+<!-- Hero Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row gap-8 items-end">
+<div class="flex-1">
+<span class="font-['Space_Grotesk'] text-xs uppercase tracking-[0.2em] text-primary/60 mb-2 block">Student Console</span>
+<h2 class="text-5xl font-bold tracking-tighter text-on-surface leading-tight">Good morning, <span class="text-primary">Alex.</span></h2>
+<p class="font-['JetBrains_Mono'] text-on-surface/60 mt-4 max-w-xl">System architecture reports 88% readiness for your upcoming Technical Round with Quantum Dynamics. Recommended focus: Distributed Systems.</p>
+</div>
+<!-- AI Recommended Action Card -->
+<div class="w-full md:w-96 p-6 rounded-xl bg-surface-container luminous-border relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">auto_awesome</span>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">play_circle</span>
+</div>
+<div>
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase text-primary/80 mb-1">AI Recommendation</p>
+<h3 class="font-bold text-lg mb-3">Live System Design Drill</h3>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95">
+                                START SESSION <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Orbital Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- 1. Readiness Score -->
+<div class="bg-surface-container-low p-6 rounded-xl luminous-border flex flex-col items-center justify-between min-h-[300px]">
+<div class="w-full flex justify-between items-start">
+<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary">Readiness Score</span>
+<span class="material-symbols-outlined text-primary/40">info</span>
+</div>
+<div class="relative flex items-center justify-center">
+<svg class="w-40 h-40 transform -rotate-90">
+<circle class="text-surface-container-highest" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary drop-shadow-[0_0_8px_rgba(192,193,255,0.4)]" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="52.8" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-black text-on-surface">88%</span>
+<span class="font-['JetBrains_Mono'] text-[10px] text-secondary">TOP 5%</span>
+</div>
+</div>
+<p class="text-[11px] text-center text-on-surface/60 font-medium">Neural prediction based on 14 mock assessments</p>
+</div>
+<!-- 2. Today's Tasks -->
+<div class="bg-surface-container-low p-6 rounded-xl luminous-border min-h-[300px] flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary">Priority Ops</span>
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-secondary/30"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-secondary/30"></div>
+</div>
+</div>
+<div class="space-y-4 flex-1">
+<div class="flex items-center gap-3 p-3 rounded-lg bg-surface-container border-l-2 border-secondary">
+<span class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-medium">Review CAP Theorem</span>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-lg bg-surface-container border-l-2 border-primary/20">
+<span class="material-symbols-outlined text-on-surface/20 text-lg">radio_button_unchecked</span>
+<span class="text-sm font-medium">Behavioral Drill 04</span>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-lg bg-surface-container border-l-2 border-primary/20">
+<span class="material-symbols-outlined text-on-surface/20 text-lg">radio_button_unchecked</span>
+<span class="text-sm font-medium">Optimize Portfolio V3</span>
+</div>
+</div>
+<button class="mt-4 w-full py-2 border border-outline-variant/30 rounded-lg text-[10px] uppercase font-bold tracking-widest text-on-surface/60 hover:bg-surface-container transition-all">VIEW ALL PIPELINES</button>
+</div>
+<!-- 3. Skill Gap Map -->
+<div class="bg-surface-container-low p-6 rounded-xl luminous-border min-h-[300px] flex flex-col">
+<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary mb-6">Skill Gap Map</span>
+<div class="space-y-6 flex-1 justify-center flex flex-col">
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold uppercase">
+<span>DSA &amp; Logic</span>
+<span class="text-primary">94%</span>
+</div>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 94%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold uppercase">
+<span>System Design</span>
+<span class="text-secondary">72%</span>
+</div>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 72%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold uppercase">
+<span>Soft Skills</span>
+<span class="text-primary">85%</span>
+</div>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 85%"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4 p-2 bg-secondary/10 rounded-lg">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>
+<span class="text-[10px] text-secondary font-bold">+12% growth this week</span>
+</div>
+</div>
+<!-- 4. Interview Streak -->
+<div class="bg-surface-container-low p-6 rounded-xl luminous-border min-h-[300px] flex flex-col">
+<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary mb-6">Activity Frequency</span>
+<div class="flex-1">
+<div class="grid grid-cols-7 gap-1.5">
+<!-- Simulated Heatmap Grid (Last 35 days) -->
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/40 rounded-sm"></div>
+<div class="aspect-square bg-secondary/20 rounded-sm"></div>
+<div class="aspect-square bg-secondary/80 rounded-sm"></div>
+<div class="aspect-square bg-secondary/60 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/20 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/30 rounded-sm"></div>
+<div class="aspect-square bg-secondary/90 rounded-sm"></div>
+<div class="aspect-square bg-secondary/50 rounded-sm"></div>
+<div class="aspect-square bg-secondary/20 rounded-sm"></div>
+<div class="aspect-square bg-secondary/40 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/20 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/30 rounded-sm"></div>
+<div class="aspect-square bg-secondary/60 rounded-sm"></div>
+<div class="aspect-square bg-secondary/80 rounded-sm"></div>
+<div class="aspect-square bg-secondary/40 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/40 rounded-sm"></div>
+<div class="aspect-square bg-secondary/20 rounded-sm"></div>
+<div class="aspect-square bg-secondary/80 rounded-sm"></div>
+<div class="aspect-square bg-secondary/60 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/20 rounded-sm"></div>
+<div class="aspect-square bg-secondary/10 rounded-sm"></div>
+<div class="aspect-square bg-secondary/40 rounded-sm"></div>
+<div class="aspect-square bg-secondary/20 rounded-sm"></div>
+<div class="aspect-square bg-primary/80 rounded-sm border border-primary/40"></div>
+<div class="aspect-square bg-surface-container rounded-sm border border-outline-variant/30"></div>
+<div class="aspect-square bg-surface-container rounded-sm border border-outline-variant/30"></div>
+<div class="aspect-square bg-surface-container rounded-sm border border-outline-variant/30"></div>
+</div>
+<div class="mt-4 flex justify-between items-center font-['JetBrains_Mono'] text-[9px] text-on-surface/40">
+<span>LOWER INTENSITY</span>
+<span>HIGHER</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/20 flex items-center justify-between">
+<div>
+<p class="text-[9px] uppercase text-on-surface/40">Total Drills</p>
+<p class="font-bold text-lg">142</p>
+</div>
+<div class="text-right">
+<p class="text-[9px] uppercase text-on-surface/40">Best Streak</p>
+<p class="font-bold text-lg text-primary">24d</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Intelligence Feed (Bento Style Sub-section) -->
+<section class="mt-12">
+<h3 class="font-['JetBrains_Mono'] text-xs uppercase tracking-[0.2em] text-on-surface/40 mb-6">Recent Intelligence Logs</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-surface-container-low rounded-xl luminous-border overflow-hidden">
+<div class="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+<span class="text-sm font-bold">Upcoming Placement Opportunities</span>
+<span class="material-symbols-outlined text-primary text-sm">open_in_new</span>
+</div>
+<div class="p-0">
+<div class="flex items-center gap-6 p-6 hover:bg-surface-container transition-colors border-b border-outline-variant/10">
+<div class="w-12 h-12 bg-surface-container-high rounded-xl flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined">rocket_launch</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Stellar Dynamics Inc.</p>
+<p class="text-xs text-on-surface/60 font-['JetBrains_Mono']">Software Engineer II • Hybrid SF</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-1 rounded">MATCH: 92%</span>
+</div>
+</div>
+<div class="flex items-center gap-6 p-6 hover:bg-surface-container transition-colors">
+<div class="w-12 h-12 bg-surface-container-high rounded-xl flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined">data_object</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Neural Systems Lab</p>
+<p class="text-xs text-on-surface/60 font-['JetBrains_Mono']">Backend Engineer • Remote</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-1 rounded">MATCH: 84%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl luminous-border p-6 flex flex-col items-center justify-center text-center relative group">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="vibrant abstract 3d digital nodes interconnected with neon glowing lines representing artificial intelligence networking" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOcKEtIA3Huzvu5qTGxNgkwOd4EpUEH_c6QmA_x-BlyzofmlIP9OjDkJblLU1mXlNBWP-xJuGNRcfYfouydLDc3PPbfh4BWLJY2Rs2eavholnpM14JE_kk9aMEgUTgP2egB9_06Ta6oYqFo-ra6eQ5QRGfzx7sGVSrztTKPlKwfmw5xzuHk2dQGDoXxPdWGDGhOwjtDsl6sOYKLtq47LaP4aWYqiZU1OQIwFy3qwDO2it-EBm4mR5ilijrZlcacYtzv10R6PoZcys"/>
+<div class="relative z-10">
+<div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/40">
+<span class="material-symbols-outlined text-primary text-3xl">hub</span>
+</div>
+<h4 class="font-bold text-lg mb-2">Network Hub</h4>
+<p class="text-xs text-on-surface/60 mb-6">Connect with 12 alumni currently at your target companies.</p>
+<button class="w-full py-2 bg-on-surface text-surface font-black text-[10px] uppercase tracking-widest rounded-lg hover:bg-primary transition-colors">INITIATE CONNECTION</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Persistent AI Coach Interface (Bottom-right) -->
+<div class="fixed bottom-8 right-8 z-[100] group">
+<div class="flex flex-col items-end gap-4">
+<!-- Ghosted message preview -->
+<div class="bg-surface-container-high/90 backdrop-blur-xl border border-primary/30 p-4 rounded-2xl rounded-br-none max-w-[280px] neural-glow opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+<p class="text-xs font-['JetBrains_Mono'] text-on-surface/80">"Alex, I've analyzed your latest mock interview. Would you like to review the concurrency questions you missed?"</p>
+</div>
+<button class="w-16 h-16 rounded-full bg-primary text-on-primary shadow-[0_0_30px_rgba(192,193,255,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 relative">
+<div class="absolute inset-0 rounded-full border-2 border-primary/50 animate-ping opacity-20"></div>
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</button>
+</div>
+</div>
+</body></html>

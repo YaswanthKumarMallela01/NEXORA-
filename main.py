@@ -1,16 +1,19 @@
 """
 NEXORA — Main Application Entry Point
-FastAPI server with multi-agent AI, RAG pipeline, and Supabase integration.
+FastAPI server with multi-agent AI, RAG pipeline, Supabase integration,
+and Stitch-generated Neural Minimalism frontend.
 
-Run locally:  uvicorn main:app --reload --port 8000
+Run locally:  .venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000
 Deploy:        Vercel serverless (see vercel.json)
 """
 
 import logging
+from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from config import get_settings
 from api.middleware import setup_cors, RateLimitMiddleware, RequestLoggingMiddleware
@@ -34,6 +37,9 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger("nexora")
+
+# Frontend directory path
+FRONTEND_DIR = Path(__file__).parent / "frontend"
 
 
 # ────────────────────────────────────────────────────────────
@@ -76,6 +82,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"✗ Pinecone connection failed: {e}")
 
+    logger.info(f"✓ Frontend UI: {FRONTEND_DIR} ({len(list(FRONTEND_DIR.glob('*.html')))} pages)")
     logger.info("✓ All systems initialized")
     logger.info("=" * 60)
 
@@ -108,7 +115,7 @@ app.add_middleware(RateLimitMiddleware, max_requests=100, window_seconds=60)
 app.add_middleware(RequestLoggingMiddleware)
 setup_cors(app)
 
-# ── Routers ──
+# ── API Routers ──
 app.include_router(auth_router)
 app.include_router(resume_router)
 app.include_router(coach_router)
@@ -117,27 +124,68 @@ app.include_router(dashboard_router)
 app.include_router(alerts_router)
 app.include_router(tasks_router)
 
+# ── Static files (frontend assets if any) ──
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+
 
 # ────────────────────────────────────────────────────────────
-#  Root & Health
+#  Frontend Page Routes (Stitch Neural Minimalism UI)
 # ────────────────────────────────────────────────────────────
 
-@app.get("/", tags=["System"])
+def _serve_page(filename: str) -> HTMLResponse:
+    """Read and serve an HTML file from the frontend directory."""
+    filepath = FRONTEND_DIR / filename
+    if filepath.exists():
+        return HTMLResponse(content=filepath.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>Page not found</h1>", status_code=404)
+
+
+@app.get("/", tags=["Frontend"], include_in_schema=False)
 async def root():
-    """API root — basic info."""
-    return {
-        "name": "NEXORA",
-        "version": "1.0.0",
-        "description": "Multi-agent AI placement readiness platform",
-        "docs": "/docs",
-        "agents": [
-            "ResumeAgent — PDF analysis & skill extraction",
-            "CoachAgent — Stateful AI mentor with memory",
-            "InterviewAgent — Mock interviews with Gemini",
-            "AlertAgent — Risk evaluation & email alerts",
-        ],
-    }
+    """Redirect root to login/landing page."""
+    return RedirectResponse(url="/login")
 
+
+@app.get("/login", tags=["Frontend"], include_in_schema=False)
+async def login_page():
+    """Landing & Login page — Neural Minimalism design."""
+    return _serve_page("login.html")
+
+
+@app.get("/student", tags=["Frontend"], include_in_schema=False)
+async def student_dashboard_page():
+    """Student Dashboard — readiness score, tasks, skills, alerts."""
+    return _serve_page("dashboard.html")
+
+
+@app.get("/coach", tags=["Frontend"], include_in_schema=False)
+async def coach_page():
+    """AI Coach — stateful chat interface with session insights."""
+    return _serve_page("coach.html")
+
+
+@app.get("/interview", tags=["Frontend"], include_in_schema=False)
+async def interview_page():
+    """Mock Interview — interactive AI interview simulator."""
+    return _serve_page("interview.html")
+
+
+@app.get("/roadmap", tags=["Frontend"], include_in_schema=False)
+async def roadmap_page():
+    """Career Roadmap — weekly prep plan with milestones."""
+    return _serve_page("roadmap.html")
+
+
+@app.get("/tpc", tags=["Frontend"], include_in_schema=False)
+async def tpc_dashboard_page():
+    """TPC Admin Dashboard — all students, risk tracking."""
+    return _serve_page("tpc.html")
+
+
+# ────────────────────────────────────────────────────────────
+#  Health & System Endpoints
+# ────────────────────────────────────────────────────────────
 
 @app.get("/health", tags=["System"])
 async def health_check():
@@ -172,6 +220,31 @@ async def health_check():
         status["status"] = "degraded"
 
     return status
+
+
+@app.get("/api/info", tags=["System"])
+async def api_info():
+    """API info endpoint — returns system status."""
+    return {
+        "name": "NEXORA",
+        "version": "1.0.0",
+        "description": "Multi-agent AI placement readiness platform",
+        "docs": "/docs",
+        "agents": [
+            "ResumeAgent — PDF analysis & skill extraction",
+            "CoachAgent — Stateful AI mentor with memory",
+            "InterviewAgent — Mock interviews with Gemini",
+            "AlertAgent — Risk evaluation & email alerts",
+        ],
+        "frontend_pages": [
+            "/login — Landing & Authentication",
+            "/student — Student Dashboard",
+            "/coach — AI Career Coach Chat",
+            "/interview — Mock Interview Simulator",
+            "/roadmap — Career Roadmap",
+            "/tpc — TPC Admin Dashboard",
+        ],
+    }
 
 
 # ────────────────────────────────────────────────────────────
