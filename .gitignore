@@ -1,0 +1,41 @@
+# ── Environment ─────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# ── Virtual Environment ────────────────────────────────
+.venv/
+venv/
+ENV/
+
+# ── IDE ─────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Vercel ──────────────────────────────────────────────
+.vercel/
+
+# ── Misc ────────────────────────────────────────────────
+*.log
+placement_resources/*.pdf
