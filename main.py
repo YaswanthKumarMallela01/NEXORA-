@@ -167,6 +167,12 @@ async def student_dashboard_page():
     return _serve_page("dashboard.html")
 
 
+@app.get("/resume", tags=["Frontend"], include_in_schema=False)
+async def resume_scan_page():
+    """Resume upload — PDF analysis via ResumeAgent."""
+    return _serve_page("resume.html")
+
+
 @app.get("/coach", tags=["Frontend"], include_in_schema=False)
 async def coach_page():
     """AI Coach — stateful chat interface with session insights."""
@@ -248,6 +254,7 @@ async def api_info():
             "/login — Landing & Authentication",
             "/auth/callback — Email confirmation redirect (Supabase)",
             "/student — Student Dashboard",
+            "/resume — Resume PDF scan & analysis",
             "/coach — AI Career Coach Chat",
             "/interview — Mock Interview Simulator",
             "/roadmap — Career Roadmap",

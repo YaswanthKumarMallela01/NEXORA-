@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXORA | Resume Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0d14;
+            --bg-elevated: #12161f;
+            --surface: #161c28;
+            --surface-hover: #1c2435;
+            --border: rgba(99, 102, 241, 0.18);
+            --border-strong: rgba(99, 102, 241, 0.35);
+            --text: #e8eaf4;
+            --muted: #8b90a5;
+            --accent: #818cf8;
+            --accent-dim: rgba(129, 140, 248, 0.12);
+            --success: #34d399;
+            --error: #f87171;
+            --radius: 14px;
+            --radius-lg: 20px;
+        }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            background-image:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.15), transparent),
+                radial-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px;
+        }
+
+        .sidebar {
+            width: 248px;
+            min-height: 100vh;
+            background: var(--bg-elevated);
+            border-right: 1px solid var(--border);
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+        }
+        .sidebar .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; padding: 0 10px; }
+        .sidebar .brand h2 { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.02em; }
+        .sidebar .brand small {
+            display: block;
+            font-size: 0.58rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--success);
+            margin-top: 2px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s;
+            margin-bottom: 4px;
+        }
+        .nav-item:hover { background: var(--surface-hover); color: var(--text); }
+        .nav-item.active { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border); }
+        .nav-spacer { flex: 1; }
+        .logout-btn { color: var(--error) !important; }
+
+        .main {
+            margin-left: 248px;
+            flex: 1;
+            padding: 40px 48px 64px;
+            max-width: 1040px;
+        }
+
+        .page-head {
+            margin-bottom: 32px;
+        }
+        .page-head .eyebrow {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--success);
+            margin-bottom: 10px;
+        }
+        .page-head h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            max-width: 560px;
+        }
+        .page-head h1 span { color: var(--accent); }
+        .page-head p {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.98rem;
+            line-height: 1.55;
+            max-width: 560px;
+        }
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .meta-pill {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .upload-shell {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2px;
+            margin-bottom: 28px;
+        }
+        .upload-inner {
+            border: 2px dashed var(--border-strong);
+            border-radius: calc(var(--radius-lg) - 2px);
+            padding: 0 32px 28px;
+            text-align: center;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+        }
+        .upload-inner:hover, .upload-inner.dragover {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+        /* File input ONLY over the drop strip — not over the button (that was opening the picker on "Run analysis") */
+        .drop-target {
+            position: relative;
+            padding: 40px 24px 20px;
+            cursor: pointer;
+        }
+        .drop-target input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .drop-target .upload-icon,
+        .drop-target h3,
+        .drop-target .hint {
+            position: relative;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .upload-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(52,211,153,0.12));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .upload-inner h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+        .upload-inner .hint { font-size: 0.88rem; color: var(--muted); margin-bottom: 16px; }
+        .file-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            background: var(--bg);
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            max-width: 100%;
+            min-height: 38px;
+        }
+        .file-name:empty::before { content: 'No file selected'; color: var(--muted); font-style: italic; }
+
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            margin-top: 16px;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+        .btn-primary {
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            box-shadow: 0 2px 16px rgba(99, 102, 241, 0.35);
+            transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45); }
+        .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+        .progress-wrap {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            display: none;
+        }
+        .progress-wrap.visible { display: block; }
+        .progress-bar {
+            height: 4px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-bar::after {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 35%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            border-radius: 4px;
+            animation: slide 1.2s ease-in-out infinite;
+        }
+        @keyframes slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+
+        .msg {
+            margin-top: 16px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            min-height: 22px;
+            text-align: center;
+        }
+        .msg.error { color: var(--error); }
+        .msg.ok { color: var(--success); }
+
+        .results-grid {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .results-grid.visible { display: grid; }
+        @media (max-width: 900px) {
+            .results-grid { grid-template-columns: 1fr; }
+            .main { padding: 28px 20px; }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+        }
+        .card.full { grid-column: 1 / -1; }
+        .card-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+        .score-ring-wrap {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .score-num {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--success), #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .score-num small { font-size: 1.1rem; font-weight: 600; opacity: 0.85; }
+        .summary-body { font-size: 0.92rem; line-height: 1.65; color: var(--muted); }
+        .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pill {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        ul.actions-list {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        details.tech {
+            margin-top: 8px;
+        }
+        details.tech summary {
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--accent);
+            list-style: none;
+        }
+        details.tech summary::-webkit-details-marker { display: none; }
+        pre.raw {
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            line-height: 1.45;
+            overflow: auto;
+            max-height: 280px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="brand">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+            </svg>
+            <div><h2>NEXORA</h2><small>Neural Intelligence</small></div>
+        </div>
+        <a href="/student" class="nav-item">🏠 Home</a>
+        <a href="/resume" class="nav-item active">📄 Resume Scan</a>
+        <a href="/coach" class="nav-item">🤖 My Coach</a>
+        <a href="/interview" class="nav-item">🎤 Mock Interview</a>
+        <a href="/roadmap" class="nav-item">🗺️ My Roadmap</a>
+        <div class="nav-spacer"></div>
+        <a href="#" class="nav-item logout-btn" onclick="logout(); return false;">🚪 Logout</a>
+    </nav>
+
+    <div class="main">
+        <header class="page-head">
+            <p class="eyebrow">Resume intelligence</p>
+            <h1>Turn your CV into a <span>readiness score</span></h1>
+            <p>We extract skills with AI, match them against job descriptions in your knowledge base, and sync your profile so the dashboard stays accurate.</p>
+            <div class="meta-row">
+                <span class="meta-pill">PDF · max practical size ~10MB</span>
+                <span class="meta-pill">Skills + gaps + actions</span>
+                <span class="meta-pill">Updates your profile</span>
+            </div>
+        </header>
+
+        <div class="upload-shell">
+            <div class="upload-inner" id="drop-zone">
+                <div class="drop-target" id="drop-target">
+                    <input type="file" id="pdf-input" accept=".pdf,application/pdf" aria-label="Choose PDF resume">
+                    <div class="upload-icon">📄</div>
+                    <h3>Drop your resume here</h3>
+                    <p class="hint">or click this area to browse — PDF only</p>
+                </div>
+                <div class="file-name" id="file-label"></div>
+                <div class="actions-row">
+                    <button type="button" class="btn-primary" id="analyze-btn" onclick="analyzeResume(event)">Run analysis</button>
+                </div>
+                <div class="progress-wrap" id="progress-wrap">
+                    <p style="font-size:0.8rem;color:var(--muted);text-align:center;">Parsing PDF &amp; running agents…</p>
+                    <div class="progress-bar"></div>
+                </div>
+                <p id="msg" class="msg"></p>
+            </div>
+        </div>
+
+        <div class="results-grid" id="results-grid">
+            <div class="card">
+                <div class="card-label">Readiness</div>
+                <div class="score-ring-wrap">
+                    <div class="score-num" id="readiness-out">—<small>/100</small></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-label">Executive summary</div>
+                <p class="summary-body" id="summary-out"></p>
+            </div>
+            <div class="card">
+                <div class="card-label">Strengths</div>
+                <div class="pill-row" id="strengths-out"></div>
+            </div>
+            <div class="card">
+                <div class="card-label">Gaps</div>
+                <div class="pill-row" id="gaps-out"></div>
+            </div>
+            <div class="card full">
+                <div class="card-label">Recommended next steps</div>
+                <ul class="actions-list" id="actions-out"></ul>
+            </div>
+            <div class="card full">
+                <details class="tech">
+                    <summary>Technical payload (JSON)</summary>
+                    <pre class="raw" id="raw-json"></pre>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = '';
+        const token = localStorage.getItem('nexora_token');
+        if (!token) window.location.href = '/login';
+
+        const pdfInput = document.getElementById('pdf-input');
+        const dropZone = document.getElementById('drop-zone');
+
+        pdfInput.addEventListener('change', function () {
+            updateFileLabel();
+        });
+
+        ['dragenter', 'dragover'].forEach(function (ev) {
+            dropZone.addEventListener(ev, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('dragover');
+            });
+        });
+        ['dragleave', 'drop'].forEach(function (ev) {
+            dropZone.addEventListener(ev, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+            });
+        });
+        dropZone.addEventListener('drop', function (e) {
+            const f = e.dataTransfer.files && e.dataTransfer.files[0];
+            if (f && f.type === 'application/pdf') {
+                pdfInput.files = e.dataTransfer.files;
+                updateFileLabel();
+            }
+        });
+
+        function updateFileLabel() {
+            const f = pdfInput.files && pdfInput.files[0];
+            document.getElementById('file-label').textContent = f ? f.name : '';
+        }
+
+        function fileToBase64(file) {
+            return new Promise(function (resolve, reject) {
+                const r = new FileReader();
+                r.onload = function () {
+                    const s = r.result;
+                    if (typeof s !== 'string') { reject(new Error('Read failed')); return; }
+                    const i = s.indexOf('base64,');
+                    resolve(i >= 0 ? s.slice(i + 7) : s);
+                };
+                r.onerror = function () { reject(r.error); };
+                r.readAsDataURL(file);
+            });
+        }
+
+        function apiErrorMessage(data, status) {
+            if (!data) return 'Request failed (' + status + ')';
+            var d = data.detail;
+            if (Array.isArray(d)) {
+                return d.map(function (x) { return x.msg || JSON.stringify(x); }).join(' ');
+            }
+            if (typeof d === 'object') return JSON.stringify(d);
+            return d || data.error || data.message || 'Analysis failed';
+        }
+
+        async function analyzeResume(ev) {
+            if (ev) ev.stopPropagation();
+            const msg = document.getElementById('msg');
+            const btn = document.getElementById('analyze-btn');
+            const progress = document.getElementById('progress-wrap');
+            msg.textContent = '';
+            msg.className = 'msg';
+
+            if (!pdfInput.files || !pdfInput.files[0]) {
+                msg.textContent = 'Please choose a PDF file first.';
+                msg.className = 'msg error';
+                return;
+            }
+
+            btn.disabled = true;
+            progress.classList.add('visible');
+
+            try {
+                const b64 = await fileToBase64(pdfInput.files[0]);
+                const r = await fetch(API + '/api/resume/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pdf_base64: b64 })
+                });
+                const data = await r.json().catch(function () { return {}; });
+
+                if (r.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (!r.ok || !data.success) {
+                    msg.textContent = apiErrorMessage(data, r.status);
+                    msg.className = 'msg error';
+                    return;
+                }
+
+                const a = data.analysis || {};
+                var score = a.readiness_score != null ? a.readiness_score : '—';
+                document.getElementById('readiness-out').innerHTML =
+                    score + '<small>/100</small>';
+                document.getElementById('summary-out').textContent = a.summary || '—';
+
+                document.getElementById('strengths-out').innerHTML = (a.strengths || []).map(function (x) {
+                    return '<span class="pill">' + escapeHtml(String(x)) + '</span>';
+                }).join('') || '<span class="pill" style="color:var(--muted);">None listed</span>';
+
+                document.getElementById('gaps-out').innerHTML = (a.critical_gaps || []).map(function (x) {
+                    return '<span class="pill">' + escapeHtml(String(x)) + '</span>';
+                }).join('') || '<span class="pill" style="color:var(--muted);">None listed</span>';
+
+                const ul = document.getElementById('actions-out');
+                ul.innerHTML = '';
+                (a.recommended_actions || []).forEach(function (line) {
+                    const li = document.createElement('li');
+                    li.textContent = line;
+                    ul.appendChild(li);
+                });
+                if (!ul.children.length) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No specific actions returned.';
+                    ul.appendChild(li);
+                }
+
+                document.getElementById('raw-json').textContent = JSON.stringify(a, null, 2);
+                document.getElementById('results-grid').classList.add('visible');
+                msg.textContent = 'Profile updated. Review your skills on Home.';
+                msg.className = 'msg ok';
+            } catch (e) {
+                msg.textContent = e.message || String(e);
+                msg.className = 'msg error';
+            } finally {
+                btn.disabled = false;
+                progress.classList.remove('visible');
+            }
+        }
+
+        function escapeHtml(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        function logout() {
+            localStorage.removeItem('nexora_token');
+            localStorage.removeItem('nexora_user');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>

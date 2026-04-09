@@ -47,22 +47,37 @@ def _call_llm(prompt: str, temperature: float = 0.1) -> str:
 
 def parse_pdf(pdf_base64: str) -> str:
     """Extract text content from a base64-encoded PDF file."""
+    doc = None
     try:
-        pdf_bytes = base64.b64decode(pdf_base64)
+        raw = (pdf_base64 or "").strip()
+        if raw.startswith("data:"):
+            idx = raw.find("base64,")
+            if idx != -1:
+                raw = raw[idx + 7 :]
+        # Whitespace/newlines in pasted base64 breaks decode on some clients
+        raw = "".join(raw.split())
+        pdf_bytes = base64.b64decode(raw, validate=False)
+        if not pdf_bytes:
+            return "ERROR: Empty PDF data after decoding."
+
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-        text = ""
+        n_pages = doc.page_count
+        text_parts: List[str] = []
         for page in doc:
-            text += page.get_text()
-        doc.close()
-
-        if not text.strip():
-            return "ERROR: Could not extract text from PDF. The file may be image-based."
-
-        logger.info(f"Extracted {len(text)} characters from PDF ({doc.page_count} pages)")
-        return text.strip()
+            text_parts.append(page.get_text() or "")
+        text = "".join(text_parts)
     except Exception as e:
         logger.error(f"PDF parsing failed: {e}")
         return f"ERROR: Failed to parse PDF — {str(e)}"
+    finally:
+        if doc is not None:
+            doc.close()
+
+    if not text.strip():
+        return "ERROR: Could not extract text from PDF. The file may be image-based or scanned."
+
+    logger.info(f"Extracted {len(text)} characters from PDF ({n_pages} pages)")
+    return text.strip()
 
 
 # ────────────────────────────────────────────────────────────

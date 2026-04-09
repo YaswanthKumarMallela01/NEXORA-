@@ -142,6 +142,7 @@
             <div><h2>NEXORA</h2><small>Neural Intelligence</small></div>
         </div>
         <a href="/student" class="nav-item">🏠 Home</a>
+        <a href="/resume" class="nav-item">📄 Resume Scan</a>
         <a href="/coach" class="nav-item">🤖 My Coach</a>
         <a href="/interview" class="nav-item active">🎤 Mock Interview</a>
         <a href="/roadmap" class="nav-item">🗺️ My Roadmap</a>
@@ -222,6 +223,36 @@
         let currentQuestion = 0;
         let currentRole = '';
 
+        /** API returns question as either a string or { question, type, difficulty, topic, ... } */
+        function getQuestionText(q) {
+            if (q == null || q === '') return '';
+            if (typeof q === 'string') return q;
+            if (typeof q === 'object' && q.question != null) return String(q.question);
+            return '';
+        }
+        function getQuestionMeta(q) {
+            if (q == null || typeof q !== 'object') return '';
+            var parts = [];
+            if (q.type) parts.push(q.type);
+            if (q.difficulty) parts.push(q.difficulty);
+            if (q.topic) parts.push(q.topic);
+            return parts.join(' · ');
+        }
+        function evaluationScore(feedbackPayload) {
+            if (!feedbackPayload || !feedbackPayload.scores) return null;
+            var a = feedbackPayload.scores.average;
+            return a != null ? a : null;
+        }
+        function evaluationFeedbackText(feedbackPayload) {
+            if (!feedbackPayload) return '';
+            var inner = feedbackPayload.feedback || {};
+            if (inner.overall_comment) return inner.overall_comment;
+            var lines = [];
+            (inner.strengths || []).forEach(function (s) { lines.push('Strength: ' + s); });
+            (inner.improvements || []).forEach(function (s) { lines.push('Improve: ' + s); });
+            return lines.join('\n') || 'Evaluation complete.';
+        }
+
         function setRole(role) { document.getElementById('role-input').value = role; }
 
         async function startInterview() {
@@ -247,8 +278,10 @@
                     document.getElementById('interview-view').style.display = 'block';
                     document.getElementById('role-display').textContent = role;
                     document.getElementById('question-counter').textContent = `Question ${currentQuestion}/5`;
-                    document.getElementById('question-text').textContent = data.question || 'Question loading...';
-                    document.getElementById('question-context').textContent = data.context || '';
+                    document.getElementById('question-text').textContent =
+                        getQuestionText(data.question) || 'Question loading...';
+                    document.getElementById('question-context').textContent =
+                        getQuestionMeta(data.question) || '';
                 } else {
                     showMsg('setup-msg', data.detail || data.error || 'Failed to start', 'error');
                 }
@@ -276,22 +309,23 @@
                 const data = await r.json();
 
                 if (data.success) {
-                    // Show feedback
+                    // Show feedback (backend sends eval_data as "feedback")
                     document.getElementById('feedback-card').style.display = 'block';
+                    var ev = data.feedback;
+                    var sc = evaluationScore(ev);
                     document.getElementById('feedback-score').textContent =
-                        `${data.evaluation?.score || data.score || '?'}/10`;
+                        (sc != null ? sc : '?') + '/10';
                     document.getElementById('feedback-text').textContent =
-                        data.evaluation?.feedback || data.feedback || 'Evaluation complete.';
+                        evaluationFeedbackText(ev);
 
-                    if (data.session_complete || data.is_final) {
-                        // Show summary
+                    if (data.is_complete) {
                         document.getElementById('next-btn').style.display = 'none';
-                        setTimeout(() => showSummary(data), 2000);
+                        setTimeout(function () { showSummary(data); }, 2000);
                     } else {
-                        // Prepare next question
                         document.getElementById('next-btn').style.display = 'inline-block';
-                        document.getElementById('next-btn').dataset.nextQuestion = data.next_question || '';
-                        document.getElementById('next-btn').dataset.nextContext = data.next_context || '';
+                        var nq = data.next_question;
+                        document.getElementById('next-btn').dataset.nextQuestionText = getQuestionText(nq);
+                        document.getElementById('next-btn').dataset.nextQuestionMeta = getQuestionMeta(nq);
                     }
                 } else {
                     showMsg('answer-msg', data.detail || 'Evaluation failed', 'error');
@@ -305,8 +339,8 @@
         function nextQuestion() {
             currentQuestion++;
             const btn = document.getElementById('next-btn');
-            const nextQ = btn.dataset.nextQuestion;
-            const nextCtx = btn.dataset.nextContext;
+            const nextQ = btn.dataset.nextQuestionText || '';
+            const nextCtx = btn.dataset.nextQuestionMeta || '';
 
             document.getElementById('question-counter').textContent = `Question ${currentQuestion}/5`;
             document.getElementById('question-text').textContent = nextQ || 'Loading next question...';
@@ -321,21 +355,37 @@
             document.getElementById('interview-view').style.display = 'none';
             document.getElementById('summary-view').style.display = 'block';
 
-            const avg = data.summary?.average_score || data.average_score || '?';
-            document.getElementById('final-score').textContent = `${avg}/10`;
+            const avg = data.session_score != null ? data.session_score
+                : (data.summary && data.summary.average_score != null ? data.summary.average_score : null);
+            document.getElementById('final-score').textContent =
+                (avg != null ? Number(avg).toFixed(1) : '?') + '/10';
 
-            // Try to get full summary from API
             try {
                 const r = await fetch(`${API}/api/interview/summary/${sessionId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const summary = await r.json();
-                if (summary.success && summary.summary) {
-                    document.getElementById('summary-details').innerHTML = `
-                        <div style="margin-top:20px; background:var(--surface); border-radius:16px; padding:24px; border:1px solid rgba(99,102,241,0.1);">
-                            <p style="font-size:0.9rem; line-height:1.6; color:var(--on-surface-variant);">${summary.summary}</p>
-                        </div>
-                    `;
+                if (summary.success) {
+                    var text = summary.summary || '';
+                    if (!text && summary.session_score != null) {
+                        text = 'Session score: ' + summary.session_score + '/10';
+                    }
+                    var wrap = document.createElement('div');
+                    wrap.style.marginTop = '20px';
+                    wrap.style.background = 'var(--surface)';
+                    wrap.style.borderRadius = '16px';
+                    wrap.style.padding = '24px';
+                    wrap.style.border = '1px solid rgba(99,102,241,0.1)';
+                    var pre = document.createElement('pre');
+                    pre.style.whiteSpace = 'pre-wrap';
+                    pre.style.fontSize = '0.9rem';
+                    pre.style.lineHeight = '1.6';
+                    pre.style.color = 'var(--on-surface-variant)';
+                    pre.style.fontFamily = 'Inter, sans-serif';
+                    pre.textContent = text;
+                    wrap.appendChild(pre);
+                    document.getElementById('summary-details').innerHTML = '';
+                    document.getElementById('summary-details').appendChild(wrap);
                 }
             } catch (e) {
                 console.log('Summary fetch error:', e);

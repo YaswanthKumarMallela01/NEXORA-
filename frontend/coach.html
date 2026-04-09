@@ -154,6 +154,7 @@
             <div><h2>NEXORA</h2><small>Neural Intelligence</small></div>
         </div>
         <a href="/student" class="nav-item">🏠 Home</a>
+        <a href="/resume" class="nav-item">📄 Resume Scan</a>
         <a href="/coach" class="nav-item active">🤖 My Coach</a>
         <a href="/interview" class="nav-item">🎤 Mock Interview</a>
         <a href="/roadmap" class="nav-item">🗺️ My Roadmap</a>
@@ -234,6 +235,14 @@
             const welcome = document.getElementById('welcome');
             if (welcome) welcome.style.display = 'none';
 
+            if (typeof text !== 'string') {
+                if (text && typeof text === 'object') {
+                    text = text.message || text.content || text.text || JSON.stringify(text);
+                } else {
+                    text = text == null ? '' : String(text);
+                }
+            }
+
             const div = document.createElement('div');
             div.className = `message-bubble ${type}`;
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -244,6 +253,7 @@
         }
 
         function formatText(text) {
+            if (typeof text !== 'string') text = String(text);
             // Basic markdown rendering
             return text
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')

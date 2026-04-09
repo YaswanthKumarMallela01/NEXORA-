@@ -320,13 +320,34 @@ async def get_session_summary(session_id: str) -> dict:
         }
         qa_pairs.append(pair)
 
+    avg = scores.get("running_average", 0)
+    summary_lines = [
+        f"Role: {session.get('role', 'Interview')}",
+        f"Overall average: {avg}/10",
+        f"Questions answered: {len(answers)} / {len(questions)}",
+        "",
+    ]
+    for i, pair in enumerate(qa_pairs, 1):
+        qobj = pair.get("question")
+        qtext = (
+            qobj.get("question", "")
+            if isinstance(qobj, dict)
+            else (str(qobj) if qobj else "")
+        )
+        sc = pair.get("score") or {}
+        qavg = sc.get("average", "—") if isinstance(sc, dict) else sc
+        short_q = (qtext[:160] + "…") if len(qtext) > 160 else qtext
+        summary_lines.append(f"Q{i} ({qavg}/10): {short_q}")
+
     return {
         "success": True,
         "session_id": session_id,
         "role": session.get("role"),
         "total_questions": len(questions),
         "total_answered": len(answers),
-        "session_score": scores.get("running_average", 0),
+        "session_score": avg,
+        "average_score": avg,
+        "summary": "\n".join(summary_lines),
         "qa_pairs": qa_pairs,
         "created_at": session.get("created_at"),
     }
