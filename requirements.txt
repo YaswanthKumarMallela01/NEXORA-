@@ -1,3 +1,6 @@
+# Python runtime target: 3.10
+# Use with: py -3.10 -m pip install -r requirements.txt
+
 # ── Core Framework ──────────────────────────────────────
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
@@ -38,3 +41,7 @@ resend>=2.7.0,<3.0.0
 # ── Utilities ───────────────────────────────────────────
 python-jose[cryptography]>=3.3.0,<4.0.0
 passlib[bcrypt]>=1.7.4,<2.0.0
+pyjwt[crypto]>=2.10.1,<3.0.0
+cryptography>=42.0.5,<47.0.0
+cffi>=1.16.0,<3.0.0
+xxhash>=3.5.0,<4.0.0
