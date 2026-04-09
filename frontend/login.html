@@ -3,261 +3,594 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXORA | Login</title>
-    <meta name="description" content="NEXORA — Multi-agent AI placement readiness platform. Sign up or log in.">
+    <title>NEXORA | AI Placement Platform</title>
+    <meta name="description" content="NEXORA — Multi-agent AI placement readiness platform. Sign up or log in to access your personalized career coaching.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --bg: #0e1322; --surface: #1a1f2f; --surface-high: #25293a; --surface-highest: #2f3445;
-            --primary: #c0c1ff; --primary-container: #6366F1; --secondary: #4edea3;
-            --on-surface: #dee1f7; --on-surface-variant: #908fa0; --outline: #464554;
-            --error: #ffb4ab;
+            --bg: #080b14; --bg-elevated: #0e1322;
+            --surface: rgba(22, 28, 44, 0.7); --surface-solid: #161c2c;
+            --surface-high: rgba(37, 41, 58, 0.8);
+            --primary: #a5b4fc; --primary-container: #6366F1; --primary-glow: rgba(99,102,241,0.4);
+            --secondary: #4edea3; --secondary-glow: rgba(78,222,163,0.3);
+            --on-surface: #e8eaf6; --on-surface-variant: #8b90a8; --outline: rgba(99,102,241,0.2);
+            --error: #fca5a5; --error-bg: rgba(252,165,165,0.1);
+            --success-bg: rgba(78,222,163,0.1);
         }
+        html, body { height: 100%; overflow: hidden; }
         body {
             font-family: 'Inter', sans-serif; background: var(--bg); color: var(--on-surface);
-            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background-image: radial-gradient(rgba(99,102,241,0.05) 1px, transparent 1px);
-            background-size: 24px 24px;
+            display: flex;
         }
-        .top-bar {
-            position: fixed; top: 0; left: 0; right: 0; padding: 16px 32px;
-            display: flex; justify-content: space-between; align-items: center;
-            font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
-            letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary);
+
+        /* ── Offline Banner ── */
+        .offline-banner {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+            background: linear-gradient(90deg, #dc2626, #ef4444); color: white;
+            text-align: center; padding: 8px; font-size: 0.8rem; font-weight: 600;
+            transform: translateY(-100%); transition: transform 0.3s ease;
         }
-        .top-bar .logo { display: flex; align-items: center; gap: 8px; }
-        .top-bar .status { color: var(--on-surface-variant); }
+        .offline-banner.visible { transform: translateY(0); }
 
-        .login-container { width: 100%; max-width: 480px; padding: 48px; text-align: center; }
+        /* ── Toast ── */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 998; display: flex; flex-direction: column; gap: 8px; }
+        .toast {
+            padding: 14px 20px; border-radius: 12px; font-size: 0.85rem; font-weight: 500;
+            backdrop-filter: blur(20px); border: 1px solid var(--outline);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 3.7s forwards;
+            max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .toast.success { background: var(--success-bg); border-color: rgba(78,222,163,0.3); color: var(--secondary); }
+        .toast.error { background: var(--error-bg); border-color: rgba(252,165,165,0.3); color: var(--error); }
+        .toast.info { background: rgba(165,180,252,0.1); border-color: rgba(165,180,252,0.3); color: var(--primary); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { to { opacity: 0; transform: translateX(40px); } }
 
-        h1 { font-size: 3.5rem; font-weight: 900; letter-spacing: -0.03em; color: var(--primary); margin-bottom: 8px; }
+        /* ── Left Hero Panel ── */
+        .hero-panel {
+            width: 50%; height: 100vh; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 60px;
+        }
+        .hero-bg {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1040 30%, #24243e 60%, #0f172a 100%);
+        }
+        .hero-bg::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(99,102,241,0.25), transparent),
+                radial-gradient(ellipse 50% 40% at 80% 20%, rgba(78,222,163,0.15), transparent);
+        }
+        .hero-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(165,180,252,0.08) 1px, transparent 1px);
+            background-size: 28px 28px;
+            animation: gridFloat 20s linear infinite;
+        }
+        @keyframes gridFloat {
+            0% { background-position: 0 0; }
+            100% { background-position: 28px 28px; }
+        }
 
-        .neural-bars { display: flex; gap: 3px; justify-content: center; margin-bottom: 20px; }
-        .neural-bars span { width: 3px; border-radius: 2px; background: var(--primary-container); animation: pulse 1.2s ease-in-out infinite; }
-        .neural-bars span:nth-child(1) { height: 12px; animation-delay: 0s; }
-        .neural-bars span:nth-child(2) { height: 8px; animation-delay: 0.15s; }
-        .neural-bars span:nth-child(3) { height: 16px; animation-delay: 0.3s; }
-        .neural-bars span:nth-child(4) { height: 6px; animation-delay: 0.45s; }
-        .neural-bars span:nth-child(5) { height: 14px; animation-delay: 0.6s; }
-        @keyframes pulse { 0%, 100% { transform: scaleY(1); opacity: 0.6; } 50% { transform: scaleY(1.8); opacity: 1; } }
+        /* Floating orbs */
+        .orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(60px); opacity: 0.4; animation: orbFloat 8s ease-in-out infinite;
+        }
+        .orb-1 { width: 300px; height: 300px; background: rgba(99,102,241,0.35); top: 10%; left: 10%; animation-delay: 0s; }
+        .orb-2 { width: 200px; height: 200px; background: rgba(78,222,163,0.25); bottom: 20%; right: 15%; animation-delay: 3s; }
+        .orb-3 { width: 160px; height: 160px; background: rgba(165,180,252,0.2); top: 50%; left: 60%; animation-delay: 5s; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20px, -30px) scale(1.05); }
+            66% { transform: translate(-15px, 15px) scale(0.95); }
+        }
 
-        .tagline { font-size: 1.05rem; line-height: 1.6; color: var(--on-surface); margin-bottom: 8px; }
-        .tagline .highlight { color: var(--secondary); }
-        .system-label { font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 36px; }
+        .hero-content { position: relative; z-index: 2; text-align: center; max-width: 480px; }
+        .hero-logo {
+            width: 72px; height: 72px; margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--primary-container), #818cf8);
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 32px var(--primary-glow);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 8px 32px var(--primary-glow); }
+            50% { box-shadow: 0 8px 48px var(--primary-glow), 0 0 80px rgba(99,102,241,0.15); }
+        }
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif; font-size: 3.2rem; font-weight: 700;
+            letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px;
+            background: linear-gradient(135deg, #e0e7ff, #a5b4fc, #818cf8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: 1.05rem; line-height: 1.7; color: var(--on-surface-variant); margin-bottom: 40px;
+        }
+        .hero-subtitle .accent { color: var(--secondary); font-weight: 600; }
 
-        .form-card { background: var(--surface); border: 1px solid var(--outline); border-radius: 16px; padding: 32px; text-align: left; }
+        .agents-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+        .agent-card {
+            background: rgba(255,255,255,0.04); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+            padding: 16px; text-align: left; transition: all 0.3s ease;
+        }
+        .agent-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-2px); background: rgba(255,255,255,0.06); }
+        .agent-card .icon { font-size: 1.3rem; margin-bottom: 6px; }
+        .agent-card .name { font-weight: 600; font-size: 0.85rem; color: var(--primary); }
+        .agent-card .desc { font-size: 0.75rem; color: var(--on-surface-variant); margin-top: 2px; }
 
-        .tab-row { display: flex; margin-bottom: 24px; border-radius: 10px; overflow: hidden; border: 1px solid var(--outline); }
+        .powered-by {
+            position: absolute; bottom: 32px; left: 0; right: 0; text-align: center; z-index: 2;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.08em; text-transform: uppercase; color: rgba(139,144,168,0.5);
+        }
+
+        /* ── Right Form Panel ── */
+        .form-panel {
+            width: 50%; height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 40px; position: relative;
+            background: var(--bg);
+            background-image: radial-gradient(rgba(99,102,241,0.03) 1px, transparent 1px);
+            background-size: 24px 24px; overflow-y: auto;
+        }
+
+        .form-wrapper {
+            width: 100%; max-width: 420px;
+            animation: fadeUp 0.6s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header { text-align: center; margin-bottom: 32px; }
+        .form-header h2 {
+            font-size: 1.6rem; font-weight: 700; margin-bottom: 6px;
+        }
+        .form-header p { color: var(--on-surface-variant); font-size: 0.9rem; }
+
+        .status-row {
+            display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .status-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--surface); backdrop-filter: blur(12px);
+            border: 1px solid var(--outline); border-radius: 24px;
+            padding: 5px 12px; font-size: 0.7rem; font-family: 'JetBrains Mono'; color: var(--on-surface-variant);
+        }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-dot.green { background: var(--secondary); box-shadow: 0 0 8px var(--secondary-glow); }
+        .status-dot.red { background: var(--error); }
+        .status-dot.orange { background: #fbbf24; }
+
+        .form-card {
+            background: var(--surface); backdrop-filter: blur(20px);
+            border: 1px solid var(--outline); border-radius: 20px;
+            padding: 32px; position: relative; overflow: hidden;
+        }
+        .form-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-container), var(--secondary), transparent);
+            opacity: 0.6;
+        }
+
+        .tab-row {
+            display: flex; margin-bottom: 28px; border-radius: 12px; overflow: hidden;
+            border: 1px solid var(--outline); background: rgba(0,0,0,0.2);
+        }
         .tab-btn {
-            flex: 1; padding: 12px; text-align: center; font-family: 'Space Grotesk'; font-size: 0.8rem;
-            font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
-            background: transparent; border: none; color: var(--on-surface-variant); transition: all 0.2s;
+            flex: 1; padding: 12px; text-align: center; font-family: 'Space Grotesk';
+            font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+            cursor: pointer; background: transparent; border: none; color: var(--on-surface-variant);
+            transition: all 0.25s ease; position: relative;
         }
-        .tab-btn.active { background: var(--primary-container); color: white; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary-container), #818cf8);
+            color: white; box-shadow: 0 4px 16px var(--primary-glow);
+        }
 
-        .field-label { font-family: 'Space Grotesk'; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 6px; margin-top: 16px; }
-        .field-label:first-of-type { margin-top: 0; }
-
+        .field-group { margin-bottom: 20px; }
+        .field-label {
+            font-family: 'Space Grotesk'; font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant);
+            margin-bottom: 8px; display: block;
+        }
+        .input-wrap {
+            position: relative;
+        }
         .input-field {
-            width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--outline);
-            color: var(--on-surface); font-family: 'Inter'; font-size: 0.95rem; padding: 12px 0;
-            outline: none; transition: border-color 0.3s;
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--outline);
+            border-radius: 12px; color: var(--on-surface); font-family: 'Inter';
+            font-size: 0.92rem; padding: 14px 16px; outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .input-field:focus { border-bottom-color: var(--primary-container); box-shadow: 0 2px 8px rgba(99,102,241,0.15); }
-        .input-field::placeholder { color: var(--on-surface-variant); }
+        .input-field:focus {
+            border-color: var(--primary-container);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15), 0 4px 16px rgba(99,102,241,0.1);
+        }
+        .input-field::placeholder { color: rgba(139,144,168,0.6); }
 
-        .name-field { display: block; }
+        /* Password Strength */
+        .pw-strength { margin-top: 8px; }
+        .pw-bar-track { height: 3px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+        .pw-bar-fill { height: 100%; width: 0%; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+        .pw-label { font-size: 0.68rem; margin-top: 4px; color: var(--on-surface-variant); font-family: 'JetBrains Mono'; }
 
         .btn-primary {
-            width: 100%; margin-top: 24px; padding: 14px; background: var(--primary-container);
-            color: white; border: none; border-radius: 8px; font-family: 'Space Grotesk';
-            font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
-            cursor: pointer; transition: transform 0.15s, box-shadow 0.3s;
+            width: 100%; margin-top: 8px; padding: 15px;
+            background: linear-gradient(135deg, var(--primary-container), #818cf8);
+            color: white; border: none; border-radius: 12px; font-family: 'Space Grotesk';
+            font-size: 0.88rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 20px var(--primary-glow);
+            position: relative; overflow: hidden;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.3); }
-        .btn-primary:active { transform: scale(0.97); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        .message { margin-top: 16px; font-size: 0.85rem; text-align: center; min-height: 20px; }
-        .message.success { color: var(--secondary); }
-        .message.error { color: var(--error); }
-
-        .status-pill {
-            position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 8px;
-            background: var(--surface-high); border: 1px solid var(--outline); border-radius: 24px;
-            padding: 8px 16px; font-family: 'Space Grotesk'; font-size: 0.7rem;
-            letter-spacing: 0.08em; text-transform: uppercase; color: var(--on-surface-variant);
+        .btn-primary::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 0; height: 0; border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
         }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--secondary); animation: blink 2s ease-in-out infinite; }
-        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--primary-glow);
+        }
+        .btn-primary:hover::after { width: 300px; height: 300px; }
+        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+        .btn-primary .spinner-inline {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+            border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .agents-info { margin-top: 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .agent-chip { background: var(--surface); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 12px 16px; font-size: 0.75rem; }
-        .agent-chip .name { font-weight: 600; color: var(--primary); font-size: 0.8rem; }
-        .agent-chip .desc { color: var(--on-surface-variant); margin-top: 4px; }
+        .name-field { display: block; transition: max-height 0.3s ease, opacity 0.3s ease; max-height: 100px; opacity: 1; overflow: hidden; }
+        .name-field.hidden { max-height: 0; opacity: 0; margin: 0; padding: 0; }
 
-        .password-hint { font-size: 0.7rem; color: var(--on-surface-variant); margin-top: 4px; }
+        .form-footer {
+            text-align: center; margin-top: 24px; font-size: 0.78rem; color: var(--on-surface-variant);
+        }
+        .form-footer a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        .form-footer a:hover { text-decoration: underline; }
+
+        /* ── noscript ── */
+        noscript .no-js-msg {
+            position: fixed; inset: 0; z-index: 9999; background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--on-surface); font-size: 1.1rem; text-align: center; padding: 40px;
+        }
+
+        /* ── Mobile responsive ── */
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow-y: auto; }
+            html, body { height: auto; overflow: auto; }
+            .hero-panel { width: 100%; height: auto; min-height: 50vh; padding: 40px 24px; }
+            .form-panel { width: 100%; height: auto; min-height: 50vh; padding: 32px 20px; }
+            .hero-title { font-size: 2.2rem; }
+            .agents-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .powered-by { position: relative; bottom: auto; margin-top: 32px; }
+        }
+        @media (max-width: 480px) {
+            .agents-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4edea3" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
-            </svg>
-            <span>NEXORA</span>
+    <noscript><div class="no-js-msg">NEXORA requires JavaScript to run. Please enable JavaScript in your browser settings.</div></noscript>
+    <div class="offline-banner" id="offline-banner">⚡ You're offline — check your connection</div>
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ── LEFT: Hero Panel ── -->
+    <div class="hero-panel">
+        <div class="hero-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+        <div class="hero-content">
+            <div class="hero-logo">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
+                </svg>
+            </div>
+            <h1 class="hero-title">NEXORA</h1>
+            <p class="hero-subtitle">
+                Your AI placement mentor.<br>
+                <span class="accent">Knows you.</span> Guides you. Watches your back.
+            </p>
+
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="icon">📄</div>
+                    <div class="name">ResumeAgent</div>
+                    <div class="desc">PDF analysis & skill extraction</div>
+                </div>
+                <div class="agent-card">
+                    <div class="icon">🧠</div>
+                    <div class="name">CoachAgent</div>
+                    <div class="desc">AI career mentor with memory</div>
+                </div>
+                <div class="agent-card">
+                    <div class="icon">🎤</div>
+                    <div class="name">InterviewAgent</div>
+                    <div class="desc">Mock interviews & scoring</div>
+                </div>
+                <div class="agent-card">
+                    <div class="icon">🚨</div>
+                    <div class="name">AlertAgent</div>
+                    <div class="desc">Risk evaluation & alerts</div>
+                </div>
+            </div>
         </div>
-        <div class="status" id="api-status">Connecting...</div>
+
+        <div class="powered-by">Powered by Groq · Gemini · Pinecone · LangChain</div>
     </div>
 
-    <div class="login-container">
-        <h1>NEXORA</h1>
-        <div class="neural-bars"><span></span><span></span><span></span><span></span><span></span></div>
-        <p class="tagline">Your AI placement mentor. <span class="highlight">Knows you.</span><br>Guides you. Watches your back.</p>
-        <p class="system-label">Multi-Agent Cognitive Platform v1.0</p>
-
-        <div class="form-card">
-            <div class="tab-row">
-                <button class="tab-btn active" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
-                <button class="tab-btn" id="tab-login" onclick="switchTab('login')">Log In</button>
+    <!-- ── RIGHT: Form Panel ── -->
+    <div class="form-panel">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <h2>Welcome back</h2>
+                <p>Sign in to your NEXORA account</p>
             </div>
 
-            <div id="name-section" class="name-field">
-                <p class="field-label">Full Name</p>
-                <input type="text" id="name-input" class="input-field" placeholder="Enter your full name" autocomplete="name">
+            <div class="status-row">
+                <div class="status-chip"><span class="status-dot green" id="supabase-dot"></span> <span id="supabase-status">Supabase</span></div>
+                <div class="status-chip"><span class="status-dot green" id="pinecone-dot"></span> <span id="pinecone-status">Pinecone</span></div>
             </div>
 
-            <p class="field-label">Email Address</p>
-            <input type="email" id="email-input" class="input-field" placeholder="Enter your email" autocomplete="email">
+            <div class="form-card">
+                <div class="tab-row">
+                    <button class="tab-btn active" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+                    <button class="tab-btn" id="tab-login" onclick="switchTab('login')">Log In</button>
+                </div>
 
-            <p class="field-label">Password</p>
-            <input type="password" id="password-input" class="input-field" placeholder="Enter your password" autocomplete="current-password">
-            <p class="password-hint" id="password-hint">Min 6 characters</p>
+                <div id="name-section" class="field-group name-field">
+                    <label class="field-label" for="name-input">Full Name</label>
+                    <div class="input-wrap">
+                        <input type="text" id="name-input" class="input-field" placeholder="Enter your full name" autocomplete="name" maxlength="100">
+                    </div>
+                </div>
 
-            <button id="submit-btn" class="btn-primary" onclick="handleSubmit()">Create Account</button>
-            <p id="message" class="message"></p>
-        </div>
+                <div class="field-group">
+                    <label class="field-label" for="email-input">Email Address</label>
+                    <div class="input-wrap">
+                        <input type="email" id="email-input" class="input-field" placeholder="you@example.com" autocomplete="email">
+                    </div>
+                </div>
 
-        <div class="agents-info">
-            <div class="agent-chip"><div class="name">📄 ResumeAgent</div><div class="desc">PDF analysis & skill extraction</div></div>
-            <div class="agent-chip"><div class="name">🤖 CoachAgent</div><div class="desc">AI career mentor with memory</div></div>
-            <div class="agent-chip"><div class="name">🎤 InterviewAgent</div><div class="desc">Mock interviews & scoring</div></div>
-            <div class="agent-chip"><div class="name">🚨 AlertAgent</div><div class="desc">Risk evaluation & alerts</div></div>
+                <div class="field-group">
+                    <label class="field-label" for="password-input">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="password-input" class="input-field" placeholder="Min 6 characters" autocomplete="current-password" maxlength="128">
+                    </div>
+                    <div class="pw-strength" id="pw-strength" style="display:block;">
+                        <div class="pw-bar-track"><div class="pw-bar-fill" id="pw-bar"></div></div>
+                        <div class="pw-label" id="pw-label"></div>
+                    </div>
+                </div>
+
+                <button id="submit-btn" class="btn-primary" onclick="handleSubmit()">Create Account</button>
+
+                <div class="form-footer">
+                    <a href="/api/system/status" target="_blank">Check system status ↗</a>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="status-pill">
-        <span class="status-dot"></span>
-        <span id="connection-status">Checking...</span>
-    </div>
-    <p style="position:fixed;bottom:8px;left:24px;font-size:0.65rem;color:var(--on-surface-variant);max-width:420px;line-height:1.4;">
-        Email signup uses a <strong style="color:var(--secondary);">confirmation link</strong> from Supabase (not a numeric OTP).
-        If the link fails, set <code style="font-family:JetBrains Mono,monospace;">NEXT_PUBLIC_APP_URL</code> to this origin and add
-        <code style="font-family:JetBrains Mono,monospace;">/auth/callback</code> under Supabase → Auth → Redirect URLs.
-        <a href="/api/system/status" style="color:var(--primary);">Check backend status</a>
-    </p>
 
     <script>
-        const API = '';
-        let mode = 'signup'; // 'signup' or 'login'
+        /* ══════════════════════════════════════════════════════════ */
+        /*  SHARED UTILITIES                                         */
+        /* ══════════════════════════════════════════════════════════ */
 
-        // Check health
-        async function checkHealth() {
-            try {
-                const r = await fetch(API + '/health');
-                const d = await r.json();
-                document.getElementById('api-status').textContent =
-                    (d.services.supabase === 'connected' ? '✓ Supabase' : '✗ Supabase') + ' · ' +
-                    (d.services.pinecone === 'connected' ? '✓ Pinecone' : '✗ Pinecone');
-                document.getElementById('connection-status').textContent =
-                    d.status === 'healthy' ? 'All Systems Online' : 'Degraded';
-            } catch {
-                document.getElementById('api-status').textContent = 'API Offline';
-                document.getElementById('connection-status').textContent = 'Connection Failed';
+        // ── Toast notifications ──
+        function showToast(msg, type) {
+            type = type || 'info';
+            var container = document.getElementById('toast-container');
+            var el = document.createElement('div');
+            el.className = 'toast ' + type;
+            el.textContent = msg;
+            container.appendChild(el);
+            setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 4200);
+        }
+
+        // ── Offline detection ──
+        function updateOnlineStatus() {
+            var banner = document.getElementById('offline-banner');
+            if (!navigator.onLine) {
+                banner.classList.add('visible');
+            } else {
+                banner.classList.remove('visible');
             }
         }
-        checkHealth();
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
 
-        // Check if already logged in
-        const token = localStorage.getItem('nexora_token');
-        if (token) {
-            fetch(API + '/api/dashboard/student', { headers: { 'Authorization': 'Bearer ' + token } })
-                .then(r => { if (r.ok) window.location.href = '/student'; });
+        // ── Safe localStorage ──
+        function safeGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+        function safeSet(key, val) { try { localStorage.setItem(key, val); } catch(e) { showToast('Storage unavailable', 'error'); } }
+        function safeRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
+        // ── Fetch with timeout + retry ──
+        function nexoraFetch(url, opts, retries) {
+            if (retries === undefined) retries = 2;
+            var timeout = 30000;
+            var controller = new AbortController();
+            var timer = setTimeout(function() { controller.abort(); }, timeout);
+            opts = opts || {};
+            opts.signal = controller.signal;
+
+            return fetch(url, opts).then(function(r) {
+                clearTimeout(timer);
+                if (r.status === 429) {
+                    showToast('Rate limited — please wait a moment', 'error');
+                    throw new Error('Rate limited');
+                }
+                return r;
+            }).catch(function(err) {
+                clearTimeout(timer);
+                if (retries > 0 && err.name !== 'AbortError') {
+                    var delay = (3 - retries) * 1500 + 500;
+                    return new Promise(function(resolve) { setTimeout(resolve, delay); })
+                        .then(function() { return nexoraFetch(url, opts, retries - 1); });
+                }
+                throw err;
+            });
         }
 
+        // ── Escape HTML ──
+        function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        /* ══════════════════════════════════════════════════════════ */
+        /*  PAGE LOGIC                                               */
+        /* ══════════════════════════════════════════════════════════ */
+
+        var API = '';
+        var mode = 'signup';
+
+        // ── Health check ──
+        (function checkHealth() {
+            nexoraFetch(API + '/health').then(function(r) { return r.json(); }).then(function(d) {
+                var suDot = document.getElementById('supabase-dot');
+                var pcDot = document.getElementById('pinecone-dot');
+                document.getElementById('supabase-status').textContent =
+                    d.services.supabase === 'connected' ? '✓ Supabase' : '✗ Supabase';
+                suDot.className = 'status-dot ' + (d.services.supabase === 'connected' ? 'green' : 'red');
+                document.getElementById('pinecone-status').textContent =
+                    d.services.pinecone === 'connected' ? '✓ Pinecone' : '✗ Pinecone';
+                pcDot.className = 'status-dot ' + (d.services.pinecone === 'connected' ? 'green' : 'red');
+            }).catch(function() {
+                document.getElementById('supabase-status').textContent = 'Offline';
+                document.getElementById('supabase-dot').className = 'status-dot red';
+                document.getElementById('pinecone-status').textContent = 'Offline';
+                document.getElementById('pinecone-dot').className = 'status-dot red';
+            });
+        })();
+
+        // ── Auto-redirect if already logged in ──
+        (function() {
+            var token = safeGet('nexora_token');
+            if (token) {
+                nexoraFetch(API + '/api/dashboard/student', { headers: { 'Authorization': 'Bearer ' + token } })
+                    .then(function(r) { if (r.ok) window.location.href = '/student'; })
+                    .catch(function() {});
+            }
+        })();
+
+        // ── Tab switching ──
         function switchTab(tab) {
             mode = tab;
             document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
             document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-            document.getElementById('name-section').style.display = tab === 'signup' ? 'block' : 'none';
-            document.getElementById('password-hint').style.display = tab === 'signup' ? 'block' : 'none';
+            var nameField = document.getElementById('name-section');
+            if (tab === 'signup') {
+                nameField.classList.remove('hidden');
+            } else {
+                nameField.classList.add('hidden');
+            }
+            document.getElementById('pw-strength').style.display = tab === 'signup' ? 'block' : 'none';
             document.getElementById('submit-btn').textContent = tab === 'signup' ? 'Create Account' : 'Log In';
-            document.getElementById('message').textContent = '';
+            document.querySelector('.form-header h2').textContent = tab === 'signup' ? 'Create account' : 'Welcome back';
+            document.querySelector('.form-header p').textContent = tab === 'signup' ? 'Join the AI placement platform' : 'Sign in to your NEXORA account';
         }
 
-        function showMessage(text, type) {
-            const m = document.getElementById('message');
-            m.textContent = text;
-            m.className = 'message ' + type;
+        // ── Password strength meter ──
+        document.getElementById('password-input').addEventListener('input', function() {
+            var pw = this.value;
+            var score = 0;
+            if (pw.length >= 6) score++;
+            if (pw.length >= 10) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+            var pct = Math.min(score * 20, 100);
+            var bar = document.getElementById('pw-bar');
+            var label = document.getElementById('pw-label');
+            bar.style.width = pct + '%';
+
+            if (pct <= 20) { bar.style.background = '#ef4444'; label.textContent = 'Weak'; }
+            else if (pct <= 40) { bar.style.background = '#f97316'; label.textContent = 'Fair'; }
+            else if (pct <= 60) { bar.style.background = '#eab308'; label.textContent = 'Good'; }
+            else if (pct <= 80) { bar.style.background = '#22c55e'; label.textContent = 'Strong'; }
+            else { bar.style.background = '#4edea3'; label.textContent = 'Excellent'; }
+
+            if (!pw) { bar.style.width = '0%'; label.textContent = ''; }
+        });
+
+        // ── Email validation ──
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
+        // ── Submit ──
         async function handleSubmit() {
-            const email = document.getElementById('email-input').value.trim();
-            const password = document.getElementById('password-input').value;
-            const name = document.getElementById('name-input').value.trim();
+            var email = document.getElementById('email-input').value.trim();
+            var password = document.getElementById('password-input').value;
+            var name = document.getElementById('name-input').value.trim();
 
-            if (!email) return showMessage('Please enter your email', 'error');
-            if (!password) return showMessage('Please enter your password', 'error');
-            if (password.length < 6) return showMessage('Password must be at least 6 characters', 'error');
-            if (mode === 'signup' && !name) return showMessage('Please enter your name', 'error');
+            if (!email) return showToast('Please enter your email', 'error');
+            if (!isValidEmail(email)) return showToast('Please enter a valid email', 'error');
+            if (!password) return showToast('Please enter your password', 'error');
+            if (password.length < 6) return showToast('Password must be at least 6 characters', 'error');
+            if (mode === 'signup' && !name) return showToast('Please enter your name', 'error');
 
-            const btn = document.getElementById('submit-btn');
+            var btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.textContent = mode === 'signup' ? 'Creating account...' : 'Logging in...';
+            btn.innerHTML = '<span class="spinner-inline"></span>' + (mode === 'signup' ? 'Creating account...' : 'Logging in...');
 
             try {
-                const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/login';
-                const body = mode === 'signup'
-                    ? { email, password, name }
-                    : { email, password };
+                var endpoint = mode === 'signup' ? '/auth/signup' : '/auth/login';
+                var body = mode === 'signup' ? { email: email, password: password, name: name } : { email: email, password: password };
 
-                const r = await fetch(API + endpoint, {
+                var r = await nexoraFetch(API + endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
-                const d = await r.json();
+                var d = await r.json();
 
                 if (r.ok && d.success) {
                     if (d.access_token) {
-                        localStorage.setItem('nexora_token', d.access_token);
-                        localStorage.setItem('nexora_user', JSON.stringify(d.user));
-                        showMessage('Success! Redirecting to dashboard...', 'success');
-                        setTimeout(function() { window.location.href = '/student'; }, 800);
+                        safeSet('nexora_token', d.access_token);
+                        safeSet('nexora_user', JSON.stringify(d.user));
+                        showToast('Success! Redirecting...', 'success');
+                        setTimeout(function() { window.location.href = '/student'; }, 600);
                     } else if (d.needs_confirmation) {
-                        var hint = d.message || 'Check your inbox for the confirmation link from Supabase.';
-                        if (d.auth_redirect_url) {
-                            hint += ' After clicking the link you should land on: ' + d.auth_redirect_url;
-                        }
-                        showMessage(hint, 'success');
+                        showToast('Check your inbox for the confirmation link!', 'success');
                         switchTab('login');
                     }
                 } else if (r.status === 409) {
-                    showMessage(d.detail || 'Email already registered. Please log in.', 'error');
+                    showToast(d.detail || 'Email already registered. Please log in.', 'error');
                     switchTab('login');
                 } else {
-                    showMessage(d.detail || 'Something went wrong. Try again.', 'error');
+                    showToast(d.detail || 'Something went wrong. Try again.', 'error');
                 }
             } catch (e) {
-                showMessage('Network error: ' + e.message, 'error');
+                if (e.name === 'AbortError') {
+                    showToast('Request timed out. Please try again.', 'error');
+                } else {
+                    showToast('Network error: ' + e.message, 'error');
+                }
             }
 
             btn.disabled = false;
             btn.textContent = mode === 'signup' ? 'Create Account' : 'Log In';
         }
 
-        // Enter key support
+        // ── Enter key ──
         document.querySelectorAll('.input-field').forEach(function(inp) {
             inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSubmit(); });
         });

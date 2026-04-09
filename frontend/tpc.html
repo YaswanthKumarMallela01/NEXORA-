@@ -3,275 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXORA | TPC Admin</title>
+    <title>NEXORA | TPC Admin Console</title>
+    <meta name="description" content="NEXORA TPC Dashboard — Cohort-wide placement analytics for Training & Placement administrators.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-            --bg: #0e1322; --surface: #1a1f2f; --surface-high: #25293a; --surface-highest: #2f3445;
-            --primary: #c0c1ff; --primary-container: #6366F1; --secondary: #4edea3;
-            --on-surface: #dee1f7; --on-surface-variant: #908fa0; --outline: #464554;
-            --error: #ffb4ab; --tertiary: #ffb783;
-        }
-        body {
-            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--on-surface);
-            min-height: 100vh; display: flex;
-            background-image: radial-gradient(rgba(99,102,241,0.04) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        .sidebar {
-            width: 240px; min-height: 100vh; background: var(--surface);
-            border-right: 1px solid rgba(99,102,241,0.1); padding: 24px 16px;
-            display: flex; flex-direction: column; position: fixed; left: 0; top: 0;
-        }
-        .sidebar .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
-        .sidebar .brand h2 { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
-        .sidebar .brand small { display: block; font-family: 'Space Grotesk'; font-size: 0.6rem; color: var(--secondary); letter-spacing: 0.08em; text-transform: uppercase; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; color: var(--on-surface-variant); cursor: pointer; transition: all 0.2s; text-decoration: none; margin-bottom: 4px; }
-        .nav-item:hover { background: var(--surface-high); color: var(--on-surface); }
-        .nav-item.active { background: var(--surface-highest); color: var(--on-surface); border-left: 3px solid var(--primary-container); }
-        .nav-spacer { flex: 1; }
-        .logout-btn { color: var(--error); }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        :root{--bg:#080b14;--bg-elevated:#0e1322;--surface:rgba(22,28,44,.7);--surface-solid:#161c2c;--primary:#a5b4fc;--primary-container:#6366F1;--primary-glow:rgba(99,102,241,.35);--secondary:#4edea3;--secondary-glow:rgba(78,222,163,.25);--on-surface:#e8eaf6;--on-surface-variant:#8b90a8;--outline:rgba(99,102,241,.15);--error:#fca5a5;--tertiary:#fbbf24;}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--on-surface);min-height:100vh;display:flex;background-image:radial-gradient(rgba(99,102,241,.03) 1px,transparent 1px);background-size:24px 24px;}
 
-        .main { margin-left: 240px; flex: 1; padding: 32px 40px; }
+        .offline-banner{position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(90deg,#dc2626,#ef4444);color:#fff;text-align:center;padding:8px;font-size:.8rem;font-weight:600;transform:translateY(-100%);transition:transform .3s;}.offline-banner.visible{transform:translateY(0);}
+        .toast-container{position:fixed;top:20px;right:20px;z-index:998;display:flex;flex-direction:column;gap:8px;}
+        .toast{padding:14px 20px;border-radius:12px;font-size:.85rem;font-weight:500;backdrop-filter:blur(20px);border:1px solid var(--outline);animation:toastIn .3s ease,toastOut .3s ease 3.7s forwards;max-width:360px;}
+        .toast.success{background:rgba(78,222,163,.12);color:var(--secondary);}.toast.error{background:rgba(252,165,165,.12);color:var(--error);}.toast.info{background:rgba(165,180,252,.12);color:var(--primary);}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px);}}@keyframes toastOut{to{opacity:0;transform:translateX(40px);}}
 
-        .page-header { margin-bottom: 32px; }
-        .page-header .label { font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); }
-        .page-header h1 { font-size: 2rem; font-weight: 800; margin-top: 4px; }
-        .page-header p { color: var(--on-surface-variant); font-size: 0.85rem; margin-top: 8px; }
+        .sidebar{width:260px;min-height:100vh;background:var(--bg-elevated);border-right:1px solid var(--outline);padding:24px 16px;display:flex;flex-direction:column;position:fixed;left:0;top:0;z-index:50;}
+        .sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:36px;padding:0 10px;}.sidebar .brand-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--primary-container),#818cf8);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px var(--primary-glow);}
+        .sidebar .brand h2{font-size:1.1rem;font-weight:800;color:var(--primary);}.sidebar .brand small{display:block;font-family:'Space Grotesk';font-size:.58rem;color:var(--secondary);letter-spacing:.1em;text-transform:uppercase;}
+        .nav-section-label{font-family:'Space Grotesk';font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(139,144,168,.5);padding:0 14px;margin-bottom:8px;margin-top:20px;}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-size:.85rem;font-weight:500;color:var(--on-surface-variant);cursor:pointer;transition:all .2s;text-decoration:none;margin-bottom:2px;position:relative;}
+        .nav-item:hover{background:rgba(99,102,241,.08);color:var(--on-surface);}.nav-item.active{background:rgba(99,102,241,.12);color:var(--primary);border:1px solid rgba(99,102,241,.2);}
+        .nav-item.active::before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--primary-container),var(--secondary));}
+        .nav-spacer{flex:1;}.nav-item.logout-btn{color:var(--error);}
+        .hamburger{display:none;position:fixed;top:16px;left:16px;z-index:60;width:40px;height:40px;border-radius:10px;background:var(--surface-solid);border:1px solid var(--outline);cursor:pointer;align-items:center;justify-content:center;}.hamburger span{display:block;width:18px;height:2px;background:var(--on-surface);border-radius:2px;}.hamburger span+span{margin-top:4px;}
 
-        .stats-row { display: flex; gap: 16px; margin-bottom: 32px; }
-        .stat-card { background: var(--surface); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 20px 28px; flex: 1; }
-        .stat-card .stat-label { font-family: 'Space Grotesk'; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); }
-        .stat-card .stat-value { font-size: 1.8rem; font-weight: 800; margin-top: 4px; }
-        .stat-card .stat-value.green { color: var(--secondary); }
-        .stat-card .stat-value.red { color: var(--error); }
+        .main{margin-left:260px;flex:1;padding:32px 40px;min-height:100vh;}
 
-        .section-title { font-family: 'Space Grotesk'; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 16px; }
+        .page-header{margin-bottom:28px;animation:fadeUp .5s ease;}.page-header .badge{display:inline-block;font-family:'Space Grotesk';font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:8px;background:rgba(252,165,165,.1);color:var(--error);font-weight:600;margin-bottom:10px;}
+        .page-header h1{font-size:2rem;font-weight:300;}.page-header h1 span{font-weight:700;}.page-header p{color:var(--on-surface-variant);font-size:.85rem;margin-top:8px;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}}
 
-        table { width: 100%; border-collapse: collapse; }
-        th {
-            font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
-            color: var(--on-surface-variant); text-align: left; padding: 12px 16px;
-            background: var(--surface-high);
-        }
-        th:first-child { border-radius: 12px 0 0 0; }
-        th:last-child { border-radius: 0 12px 0 0; }
-        td {
-            padding: 14px 16px; border-bottom: 1px solid rgba(99,102,241,0.05); font-size: 0.85rem;
-        }
-        tr:hover td { background: rgba(99,102,241,0.03); }
+        /* Stats */
+        .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+        .stat-card{background:var(--surface);backdrop-filter:blur(12px);border:1px solid var(--outline);border-radius:16px;padding:22px;}.stat-card .stat-label{font-family:'Space Grotesk';font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-surface-variant);}
+        .stat-card .stat-value{font-size:1.8rem;font-weight:800;margin-top:4px;}.stat-card .stat-value.green{color:var(--secondary);}.stat-card .stat-value.red{color:var(--error);}.stat-card .stat-value.purple{color:var(--primary);}.stat-card .stat-value.orange{color:var(--tertiary);}
 
-        .risk-badge { font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; }
-        .risk-badge.high { background: rgba(255,180,171,0.15); color: var(--error); }
-        .risk-badge.medium { background: rgba(255,183,131,0.15); color: var(--tertiary); }
-        .risk-badge.low { background: rgba(78,222,163,0.15); color: var(--secondary); }
+        /* Risk chart */
+        .risk-chart-card{background:var(--surface);border:1px solid var(--outline);border-radius:18px;padding:24px;margin-bottom:28px;}
+        .risk-chart-card .card-label{font-family:'Space Grotesk';font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--on-surface-variant);margin-bottom:16px;display:flex;align-items:center;gap:6px;}.card-label .dot{width:6px;height:6px;border-radius:50%;background:var(--primary-container);}
+        .risk-bars{display:flex;gap:8px;align-items:flex-end;height:80px;}
+        .risk-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+        .risk-bar{width:100%;border-radius:8px 8px 0 0;transition:height .8s ease;min-height:4px;}
+        .risk-bar.low{background:linear-gradient(180deg,var(--secondary),rgba(78,222,163,.5));}.risk-bar.medium{background:linear-gradient(180deg,var(--tertiary),rgba(251,191,36,.5));}.risk-bar.high{background:linear-gradient(180deg,var(--error),rgba(252,165,165,.5));}.risk-bar.critical{background:linear-gradient(180deg,#dc2626,rgba(220,38,38,.5));}
+        .risk-bar-label{font-family:'JetBrains Mono';font-size:.62rem;color:var(--on-surface-variant);}
 
-        .alert-card {
-            background: var(--surface); border: 1px solid rgba(99,102,241,0.1); border-radius: 12px;
-            padding: 16px 20px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        /* Search */
+        .search-row{display:flex;gap:12px;margin-bottom:20px;align-items:center;}
+        .search-input{flex:1;max-width:360px;background:rgba(0,0,0,.25);border:1px solid var(--outline);border-radius:12px;padding:12px 18px;color:var(--on-surface);font-size:.85rem;outline:none;transition:border-color .2s;}
+        .search-input:focus{border-color:var(--primary-container);}
+        .search-input::placeholder{color:rgba(139,144,168,.5);}
+        .pagination-info{font-family:'JetBrains Mono';font-size:.72rem;color:var(--on-surface-variant);}
 
-        .empty-state { text-align: center; padding: 48px; color: var(--on-surface-variant); }
-        .loading { text-align: center; padding: 40px; }
-        .spinner { width: 28px; height: 28px; border: 3px solid var(--outline); border-top-color: var(--primary-container); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Table */
+        .table-wrap{background:var(--surface);border:1px solid var(--outline);border-radius:18px;overflow:hidden;}
+        table{width:100%;border-collapse:collapse;}
+        thead th{font-family:'Space Grotesk';font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-surface-variant);padding:16px 18px;text-align:left;border-bottom:1px solid var(--outline);cursor:pointer;transition:color .2s;white-space:nowrap;}
+        thead th:hover{color:var(--primary);}
+        tbody td{padding:14px 18px;font-size:.85rem;border-bottom:1px solid rgba(99,102,241,.06);}
+        tbody tr:hover{background:rgba(99,102,241,.04);}
+        .risk-badge{font-family:'JetBrains Mono';font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:6px;font-weight:600;display:inline-block;}
+        .risk-badge.LOW{background:rgba(78,222,163,.12);color:var(--secondary);}
+        .risk-badge.MEDIUM{background:rgba(251,191,36,.12);color:var(--tertiary);}
+        .risk-badge.HIGH{background:rgba(252,165,165,.12);color:var(--error);}
+        .risk-badge.CRITICAL{background:rgba(220,38,38,.15);color:#fca5a5;}
 
-        .auth-error {
-            background: var(--surface); border: 1px solid rgba(255,180,171,0.2); border-radius: 16px;
-            padding: 48px; text-align: center; max-width: 500px; margin: 80px auto;
-        }
-        .auth-error h2 { color: var(--error); margin-bottom: 12px; }
+        .page-btns{display:flex;justify-content:center;gap:8px;padding:16px;}
+        .page-btn{background:var(--surface-solid);border:1px solid var(--outline);border-radius:8px;padding:6px 14px;font-size:.78rem;color:var(--on-surface-variant);cursor:pointer;transition:all .2s;}
+        .page-btn:hover,.page-btn.active{border-color:var(--primary);color:var(--primary);}
+        .page-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+        /* Alerts */
+        .alerts-section{margin-top:28px;background:var(--surface);border:1px solid var(--outline);border-radius:18px;padding:24px;}
+        .alert-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(99,102,241,.06);}.alert-item:last-child{border-bottom:none;}
+        .ack-btn{font-size:.72rem;padding:6px 14px;border-radius:8px;border:1px solid var(--outline);background:transparent;color:var(--primary);cursor:pointer;transition:all .2s;}
+        .ack-btn:hover{background:rgba(99,102,241,.08);}
+
+        .loading{text-align:center;padding:60px;}.loader-ring{width:36px;height:36px;border:3px solid var(--outline);border-top-color:var(--primary-container);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .access-denied{text-align:center;padding:80px 40px;}.access-denied h2{font-size:1.4rem;margin-bottom:8px;font-weight:400;}.access-denied a{display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,var(--primary-container),#818cf8);color:#fff;border-radius:12px;text-decoration:none;font-weight:600;}
+
+        @media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:768px){.sidebar{transform:translateX(-100%);transition:transform .3s;}.sidebar.open{transform:translateX(0);}.hamburger{display:flex;}.main{margin-left:0;padding:24px 16px;padding-top:60px;}.stat-grid{grid-template-columns:1fr 1fr;}}
     </style>
 </head>
 <body>
+    <div class="offline-banner" id="offline-banner">⚡ You're offline</div>
+    <div class="toast-container" id="toast-container"></div>
+    <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+
     <nav class="sidebar">
-        <div class="brand">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4edea3" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
-            </svg>
-            <div><h2>NEXORA</h2><small>Neural Intelligence</small></div>
-        </div>
-        <a href="/student" class="nav-item">🏠 Home</a>
-        <a href="/resume" class="nav-item">📄 Resume Scan</a>
-        <a href="/coach" class="nav-item">🤖 My Coach</a>
-        <a href="/interview" class="nav-item">🎤 Mock Interview</a>
-        <a href="/roadmap" class="nav-item">🗺️ My Roadmap</a>
-        <a href="/tpc" class="nav-item active">📊 TPC Admin</a>
-        <div class="nav-spacer"></div>
-        <a href="#" class="nav-item logout-btn" onclick="logout()">🚪 Logout</a>
+        <div class="brand"><div class="brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/></svg></div><div><h2>NEXORA</h2><small>Neural Intelligence</small></div></div>
+        <div class="nav-section-label">Navigation</div>
+        <a href="/student" class="nav-item">🏠 Home</a><a href="/resume" class="nav-item">📄 Resume Scan</a><a href="/coach" class="nav-item">🧠 AI Coach</a><a href="/interview" class="nav-item">🎤 Mock Interview</a><a href="/roadmap" class="nav-item">🗺️ My Roadmap</a>
+        <div class="nav-section-label">Admin</div>
+        <a href="/tpc" class="nav-item active">📊 TPC Dashboard</a>
+        <div class="nav-spacer"></div><a href="#" class="nav-item logout-btn" onclick="logout();return false;">🚪 Logout</a>
     </nav>
 
     <div class="main">
-        <div id="loading" class="loading"><div class="spinner"></div><p>Loading TPC dashboard...</p></div>
-
-        <div id="auth-error" style="display:none;" class="auth-error">
-            <h2>🔒 Access Denied</h2>
-            <p>This dashboard requires TPC admin privileges.<br>Only users with role "tpc_admin" can access this page.</p>
-            <a href="/student" style="display:inline-block;margin-top:16px;padding:12px 24px;background:var(--primary-container);color:white;border-radius:12px;text-decoration:none;font-size:0.85rem;">Go to Student Dashboard →</a>
-        </div>
-
+        <div id="loading" class="loading"><div class="loader-ring"></div><p>Loading TPC console...</p></div>
+        <div id="denied" class="access-denied" style="display:none;"><h2>🔒 Access Denied</h2><p style="color:var(--on-surface-variant);">This dashboard requires TPC Admin privileges.</p><a href="/student">← Back to Student Dashboard</a></div>
         <div id="content" style="display:none;">
-            <div class="page-header">
-                <div class="label">Training & Placement Cell</div>
-                <h1>TPC Admin Hub</h1>
-                <p>Real-time cohort monitoring & placement risk intelligence.</p>
+            <div class="page-header"><span class="badge">Admin</span><h1>TPC <span>Admin Console</span></h1><p>Cohort-wide placement analytics and at-risk student monitoring.</p></div>
+
+            <div class="stat-grid" id="stat-grid">
+                <div class="stat-card"><div class="stat-label">Total Students</div><div class="stat-value purple" id="total-students">-</div></div>
+                <div class="stat-card"><div class="stat-label">At Risk</div><div class="stat-value red" id="at-risk">-</div></div>
+                <div class="stat-card"><div class="stat-label">Average Score</div><div class="stat-value green" id="avg-score">-</div></div>
+                <div class="stat-card"><div class="stat-label">Active Alerts</div><div class="stat-value orange" id="alert-count">-</div></div>
             </div>
 
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-label">Total Students</div>
-                    <div class="stat-value" id="total-students">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">At-Risk Students</div>
-                    <div class="stat-value red" id="at-risk-count">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Avg Readiness</div>
-                    <div class="stat-value green" id="avg-readiness">0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Active Alerts</div>
-                    <div class="stat-value" id="active-alerts">0</div>
+            <div class="risk-chart-card">
+                <div class="card-label"><span class="dot"></span> Risk Distribution</div>
+                <div class="risk-bars" id="risk-bars">
+                    <div class="risk-bar-wrap"><div class="risk-bar low" id="risk-low" style="height:4px;"></div><div class="risk-bar-label">Low</div></div>
+                    <div class="risk-bar-wrap"><div class="risk-bar medium" id="risk-med" style="height:4px;"></div><div class="risk-bar-label">Medium</div></div>
+                    <div class="risk-bar-wrap"><div class="risk-bar high" id="risk-high" style="height:4px;"></div><div class="risk-bar-label">High</div></div>
+                    <div class="risk-bar-wrap"><div class="risk-bar critical" id="risk-crit" style="height:4px;"></div><div class="risk-bar-label">Critical</div></div>
                 </div>
             </div>
 
-            <!-- Students Table -->
-            <div class="section-title">Student Cohort</div>
-            <div style="background: var(--surface); border-radius: 16px; overflow: hidden; margin-bottom: 32px;">
+            <div class="search-row">
+                <input type="text" class="search-input" id="search-input" placeholder="Search students by name or email..." oninput="handleSearch()">
+                <span class="pagination-info" id="page-info">Page 1</span>
+            </div>
+
+            <div class="table-wrap">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Student</th>
-                            <th>Email</th>
-                            <th>Readiness</th>
-                            <th>Risk Level</th>
-                            <th>Last Active</th>
-                        </tr>
-                    </thead>
-                    <tbody id="students-table">
-                        <tr><td colspan="5" class="empty-state">No student data</td></tr>
-                    </tbody>
+                    <thead><tr><th onclick="sortBy('name')">Student ↕</th><th onclick="sortBy('email')">Email ↕</th><th onclick="sortBy('readiness_score')">Score ↕</th><th onclick="sortBy('risk_level')">Risk ↕</th></tr></thead>
+                    <tbody id="students-body"><tr><td colspan="4" style="text-align:center;padding:40px;color:var(--on-surface-variant);">Loading...</td></tr></tbody>
                 </table>
+                <div class="page-btns" id="page-btns"></div>
             </div>
 
-            <!-- At-Risk Students -->
-            <div class="section-title">At-Risk Students</div>
-            <div id="at-risk-list">
-                <div class="empty-state">No at-risk students detected</div>
-            </div>
-
-            <!-- Recent Alerts -->
-            <div class="section-title" style="margin-top: 32px;">Recent Alerts</div>
-            <div id="alerts-list">
-                <div class="empty-state">No recent alerts</div>
+            <div class="alerts-section">
+                <div class="card-label"><span class="dot"></span> Recent Alerts</div>
+                <div id="alerts-list"></div>
             </div>
         </div>
     </div>
 
     <script>
-        const API = '';
-        const token = localStorage.getItem('nexora_token');
-        if (!token) window.location.href = '/login';
+        function showToast(m,t){t=t||'info';var c=document.getElementById('toast-container'),e=document.createElement('div');e.className='toast '+t;e.textContent=m;c.appendChild(e);setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e);},4200);}
+        function updateOnlineStatus(){document.getElementById('offline-banner').classList.toggle('visible',!navigator.onLine);}
+        window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);updateOnlineStatus();
+        function safeGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+        function safeRemove(k){try{localStorage.removeItem(k);}catch(e){}}
+        function nexoraFetch(u,o,r){if(r===undefined)r=2;var c=new AbortController();var t=setTimeout(function(){c.abort();},30000);o=o||{};o.signal=c.signal;return fetch(u,o).then(function(res){clearTimeout(t);return res;}).catch(function(err){clearTimeout(t);if(r>0&&err.name!=='AbortError'){var d=(3-r)*1500+500;return new Promise(function(resolve){setTimeout(resolve,d);}).then(function(){return nexoraFetch(u,o,r-1);});}throw err;});}
+        function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-        async function loadTPCDashboard() {
-            try {
-                const r = await fetch(`${API}/api/dashboard/tpc`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+        var API='',token=safeGet('nexora_token');
+        if(!token)window.location.href='/login';
+        var allStudents=[],filteredStudents=[],currentPage=1,perPage=25,sortField='name',sortDir=1;
+        var searchTimer=null;
 
-                if (r.status === 401) { window.location.href = '/login'; return; }
-                if (r.status === 403) {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('auth-error').style.display = 'block';
-                    return;
-                }
-
-                const data = await r.json();
-                if (!data.success) throw new Error('TPC data not available');
+        async function loadTPC(){
+            try{
+                var r=await nexoraFetch(API+'/api/dashboard/tpc',{headers:{'Authorization':'Bearer '+token}});
+                if(r.status===401){showToast('Session expired','error');setTimeout(function(){window.location.href='/login';},1200);return;}
+                if(r.status===403){document.getElementById('loading').style.display='none';document.getElementById('denied').style.display='block';return;}
+                var data=await r.json();
+                if(!data.success)throw new Error('Failed');
+                document.getElementById('loading').style.display='none';
+                document.getElementById('content').style.display='block';
                 renderTPC(data);
-            } catch (e) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('auth-error').style.display = 'block';
-                document.querySelector('#auth-error h2').textContent = '⚠ Data Error';
-                document.querySelector('#auth-error p').textContent = e.message;
+            }catch(e){
+                document.getElementById('loading').innerHTML='<p style="color:var(--error);">Failed to load: '+esc(e.message)+'</p>';
             }
         }
 
-        function renderTPC(data) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
+        function renderTPC(data){
+            allStudents=data.students||[];
+            filteredStudents=allStudents.slice();
+            document.getElementById('total-students').textContent=data.total_students||allStudents.length;
+            document.getElementById('at-risk').textContent=data.at_risk_count||allStudents.filter(function(s){return s.risk_level==='HIGH'||s.risk_level==='CRITICAL';}).length;
+            document.getElementById('avg-score').textContent=(data.average_readiness!=null?Math.round(data.average_readiness):'-')+'%';
+            var alerts=data.recent_alerts||[];
+            document.getElementById('alert-count').textContent=alerts.length;
 
-            const students = data.students || [];
-            const atRisk = data.at_risk_students || [];
-            const alerts = data.recent_alerts || [];
+            // Risk bars
+            var risks={LOW:0,MEDIUM:0,HIGH:0,CRITICAL:0};
+            allStudents.forEach(function(s){risks[s.risk_level||'LOW']++;});
+            var max=Math.max(risks.LOW,risks.MEDIUM,risks.HIGH,risks.CRITICAL,1);
+            setTimeout(function(){
+                document.getElementById('risk-low').style.height=Math.max((risks.LOW/max)*72,4)+'px';
+                document.getElementById('risk-med').style.height=Math.max((risks.MEDIUM/max)*72,4)+'px';
+                document.getElementById('risk-high').style.height=Math.max((risks.HIGH/max)*72,4)+'px';
+                document.getElementById('risk-crit').style.height=Math.max((risks.CRITICAL/max)*72,4)+'px';
+            },200);
 
-            document.getElementById('total-students').textContent = students.length;
-            document.getElementById('at-risk-count').textContent = atRisk.length;
-            document.getElementById('active-alerts').textContent = alerts.filter(a => !a.acknowledged).length;
+            renderTable();
 
-            // Average readiness
-            const scores = students.filter(s => s.readiness_score).map(s => s.readiness_score);
-            const avg = scores.length ? Math.round(scores.reduce((a,b) => a+b, 0) / scores.length) : 0;
-            document.getElementById('avg-readiness').textContent = avg + '%';
+            // Alerts
+            if(alerts.length>0){
+                document.getElementById('alerts-list').innerHTML=alerts.slice(0,10).map(function(a){
+                    return'<div class="alert-item"><div><strong>'+esc(a.message||a.type||'Alert')+'</strong><div style="font-size:.72rem;color:var(--on-surface-variant);margin-top:2px;">'+esc((a.student_name||a.user_id||'Student')+' · '+(a.sent_at?new Date(a.sent_at).toLocaleDateString():''))+'</div></div>'+(a.acknowledged?'<span style="font-size:.72rem;color:var(--secondary);">✓ Ack</span>':'<button class="ack-btn" onclick="ackAlert(\''+a.id+'\',this)">Acknowledge</button>')+'</div>';
+                }).join('');
+            }else{
+                document.getElementById('alerts-list').innerHTML='<p style="color:var(--on-surface-variant);padding:12px 0;">No recent alerts</p>';
+            }
+        }
 
-            // Students table
-            if (students.length > 0) {
-                document.getElementById('students-table').innerHTML = students.map(s => {
-                    const risk = s.at_risk ? 'high' : (s.readiness_score < 50 ? 'medium' : 'low');
-                    return `
-                        <tr>
-                            <td><strong>${s.name || 'Student'}</strong></td>
-                            <td style="font-family: JetBrains Mono; font-size: 0.8rem;">${s.email || '-'}</td>
-                            <td><strong style="color: ${s.readiness_score >= 60 ? 'var(--secondary)' : 'var(--tertiary)'};">${s.readiness_score || 0}%</strong></td>
-                            <td><span class="risk-badge ${risk}">${risk.toUpperCase()}</span></td>
-                            <td style="font-family: JetBrains Mono; font-size: 0.75rem; color: var(--on-surface-variant);">${s.updated_at ? new Date(s.updated_at).toLocaleDateString() : '-'}</td>
-                        </tr>
-                    `;
+        function renderTable(){
+            var sorted=filteredStudents.slice().sort(function(a,b){
+                var av=a[sortField]||'',bv=b[sortField]||'';
+                if(typeof av==='number'&&typeof bv==='number')return(av-bv)*sortDir;
+                return String(av).localeCompare(String(bv))*sortDir;
+            });
+            var totalPages=Math.ceil(sorted.length/perPage)||1;
+            if(currentPage>totalPages)currentPage=totalPages;
+            var start=(currentPage-1)*perPage,end=start+perPage;
+            var page=sorted.slice(start,end);
+            document.getElementById('page-info').textContent='Page '+currentPage+' of '+totalPages+' ('+sorted.length+' students)';
+
+            if(page.length===0){
+                document.getElementById('students-body').innerHTML='<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--on-surface-variant);">No students found</td></tr>';
+            }else{
+                document.getElementById('students-body').innerHTML=page.map(function(s){
+                    return'<tr><td>'+esc(s.name||'—')+'</td><td style="font-family:JetBrains Mono;font-size:.78rem;">'+esc(s.email||'—')+'</td><td><strong>'+(s.readiness_score!=null?s.readiness_score+'%':'—')+'</strong></td><td><span class="risk-badge '+esc(s.risk_level||'LOW')+'">'+esc(s.risk_level||'LOW')+'</span></td></tr>';
                 }).join('');
             }
 
-            // At-risk list
-            if (atRisk.length > 0) {
-                document.getElementById('at-risk-list').innerHTML = atRisk.map(s => `
-                    <div class="alert-card">
-                        <div>
-                            <strong>${s.name || s.email}</strong>
-                            <div style="font-size: 0.75rem; color: var(--on-surface-variant); margin-top: 4px;">
-                                Readiness: ${s.readiness_score || 0}%
-                            </div>
-                        </div>
-                        <span class="risk-badge high">AT RISK</span>
-                    </div>
-                `).join('');
+            // Pagination buttons
+            var btns='';
+            btns+='<button class="page-btn" onclick="goPage('+(currentPage-1)+')" '+(currentPage<=1?'disabled':'')+'>‹ Prev</button>';
+            for(var i=1;i<=totalPages;i++){
+                if(totalPages>7&&Math.abs(i-currentPage)>2&&i!==1&&i!==totalPages){if(i===currentPage-3||i===currentPage+3)btns+='<span style="color:var(--on-surface-variant);padding:0 4px;">...</span>';continue;}
+                btns+='<button class="page-btn'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
             }
-
-            // Alerts
-            if (alerts.length > 0) {
-                document.getElementById('alerts-list').innerHTML = alerts.map(a => `
-                    <div class="alert-card">
-                        <div>
-                            <strong>${a.message || a.type || 'Alert'}</strong>
-                            <div style="font-size: 0.75rem; color: var(--on-surface-variant); margin-top: 4px;">
-                                ${a.user_id ? 'Student: ' + a.user_id.substring(0, 8) + '...' : ''}
-                                · ${new Date(a.sent_at || a.created_at).toLocaleDateString()}
-                            </div>
-                        </div>
-                        <span class="risk-badge ${(a.severity || '').toLowerCase()}">${a.severity || 'INFO'}</span>
-                    </div>
-                `).join('');
-            }
+            btns+='<button class="page-btn" onclick="goPage('+(currentPage+1)+')" '+(currentPage>=totalPages?'disabled':'')+'>Next ›</button>';
+            document.getElementById('page-btns').innerHTML=btns;
         }
 
-        function logout() {
-            localStorage.removeItem('nexora_token');
-            localStorage.removeItem('nexora_user');
-            window.location.href = '/login';
+        function goPage(p){currentPage=p;renderTable();}
+        function sortBy(field){if(sortField===field)sortDir*=-1;else{sortField=field;sortDir=1;}renderTable();}
+        function handleSearch(){clearTimeout(searchTimer);searchTimer=setTimeout(function(){var q=document.getElementById('search-input').value.trim().toLowerCase();filteredStudents=q?allStudents.filter(function(s){return(s.name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q);}):allStudents.slice();currentPage=1;renderTable();},300);}
+
+        async function ackAlert(id,btn){
+            try{await nexoraFetch(API+'/api/alerts/acknowledge/'+id,{method:'POST',headers:{'Authorization':'Bearer '+token}});btn.textContent='✓ Ack';btn.disabled=true;btn.style.color='var(--secondary)';showToast('Alert acknowledged','success');}catch(e){showToast('Failed','error');}
         }
 
-        loadTPCDashboard();
+        function logout(){safeRemove('nexora_token');safeRemove('nexora_user');showToast('Logged out','info');setTimeout(function(){window.location.href='/login';},500);}
+
+        loadTPC();
     </script>
 </body>
 </html>

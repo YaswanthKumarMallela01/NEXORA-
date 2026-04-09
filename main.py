@@ -197,6 +197,12 @@ async def tpc_dashboard_page():
     return _serve_page("tpc.html")
 
 
+@app.get("/auth-callback", tags=["Frontend"], include_in_schema=False)
+async def auth_callback_page():
+    """Supabase email confirmation callback handler."""
+    return _serve_page("auth-callback.html")
+
+
 # ────────────────────────────────────────────────────────────
 #  Health & System Endpoints
 # ────────────────────────────────────────────────────────────

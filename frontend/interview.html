@@ -4,157 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXORA | Mock Interview</title>
+    <meta name="description" content="NEXORA Mock Interview — Practice with an AI interviewer powered by Gemini.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-            --bg: #0e1322; --surface: #1a1f2f; --surface-high: #25293a; --surface-highest: #2f3445;
-            --primary: #c0c1ff; --primary-container: #6366F1; --secondary: #4edea3;
-            --on-surface: #dee1f7; --on-surface-variant: #908fa0; --outline: #464554;
-            --error: #ffb4ab; --tertiary: #ffb783;
-        }
-        body {
-            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--on-surface);
-            min-height: 100vh; display: flex;
-            background-image: radial-gradient(rgba(99,102,241,0.04) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        .sidebar {
-            width: 240px; min-height: 100vh; background: var(--surface);
-            border-right: 1px solid rgba(99,102,241,0.1); padding: 24px 16px;
-            display: flex; flex-direction: column; position: fixed; left: 0; top: 0;
-        }
-        .sidebar .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
-        .sidebar .brand h2 { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
-        .sidebar .brand small { display: block; font-family: 'Space Grotesk'; font-size: 0.6rem; color: var(--secondary); letter-spacing: 0.08em; text-transform: uppercase; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; color: var(--on-surface-variant); cursor: pointer; transition: all 0.2s; text-decoration: none; margin-bottom: 4px; }
-        .nav-item:hover { background: var(--surface-high); color: var(--on-surface); }
-        .nav-item.active { background: var(--surface-highest); color: var(--on-surface); border-left: 3px solid var(--primary-container); }
-        .nav-spacer { flex: 1; }
-        .logout-btn { color: var(--error); }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        :root{--bg:#080b14;--bg-elevated:#0e1322;--surface:rgba(22,28,44,.7);--surface-solid:#161c2c;--surface-high:rgba(37,41,58,.8);--primary:#a5b4fc;--primary-container:#6366F1;--primary-glow:rgba(99,102,241,.35);--secondary:#4edea3;--secondary-glow:rgba(78,222,163,.25);--on-surface:#e8eaf6;--on-surface-variant:#8b90a8;--outline:rgba(99,102,241,.15);--error:#fca5a5;--tertiary:#fbbf24;}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--on-surface);min-height:100vh;display:flex;background-image:radial-gradient(rgba(99,102,241,.03) 1px,transparent 1px);background-size:24px 24px;}
 
-        .main { margin-left: 240px; flex: 1; padding: 32px 40px; }
+        .offline-banner{position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(90deg,#dc2626,#ef4444);color:#fff;text-align:center;padding:8px;font-size:.8rem;font-weight:600;transform:translateY(-100%);transition:transform .3s;}.offline-banner.visible{transform:translateY(0);}
+        .toast-container{position:fixed;top:20px;right:20px;z-index:998;display:flex;flex-direction:column;gap:8px;}
+        .toast{padding:14px 20px;border-radius:12px;font-size:.85rem;font-weight:500;backdrop-filter:blur(20px);border:1px solid var(--outline);animation:toastIn .3s ease,toastOut .3s ease 3.7s forwards;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.3);}
+        .toast.success{background:rgba(78,222,163,.12);border-color:rgba(78,222,163,.3);color:var(--secondary);}.toast.error{background:rgba(252,165,165,.12);border-color:rgba(252,165,165,.3);color:var(--error);}.toast.info{background:rgba(165,180,252,.12);border-color:rgba(165,180,252,.3);color:var(--primary);}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px);}}@keyframes toastOut{to{opacity:0;transform:translateX(40px);}}
 
-        /* Setup view */
-        .setup-card {
-            max-width: 600px; margin: 80px auto; background: var(--surface);
-            border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 48px;
-            text-align: center;
-        }
-        .setup-card h1 { font-size: 1.8rem; font-weight: 300; margin-bottom: 8px; }
-        .setup-card h1 span { font-weight: 700; color: var(--primary); }
-        .setup-card p { color: var(--on-surface-variant); margin-bottom: 32px; }
-        .setup-card .label { font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 8px; text-align: left; }
-        .role-input {
-            width: 100%; background: var(--bg); border: 1px solid var(--outline); border-radius: 12px;
-            padding: 14px 20px; color: var(--on-surface); font-size: 1rem; outline: none;
-            font-family: 'JetBrains Mono'; transition: border-color 0.2s;
-        }
-        .role-input:focus { border-color: var(--primary-container); }
-        .start-btn {
-            width: 100%; margin-top: 24px; padding: 16px; background: var(--primary-container);
-            color: white; border: none; border-radius: 12px; font-family: 'Space Grotesk';
-            font-size: 0.9rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.3); }
-        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .sidebar{width:260px;min-height:100vh;background:var(--bg-elevated);border-right:1px solid var(--outline);padding:24px 16px;display:flex;flex-direction:column;position:fixed;left:0;top:0;z-index:50;}
+        .sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:36px;padding:0 10px;}
+        .sidebar .brand-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--primary-container),#818cf8);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px var(--primary-glow);}
+        .sidebar .brand h2{font-size:1.1rem;font-weight:800;color:var(--primary);}.sidebar .brand small{display:block;font-family:'Space Grotesk';font-size:.58rem;color:var(--secondary);letter-spacing:.1em;text-transform:uppercase;}
+        .nav-section-label{font-family:'Space Grotesk';font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(139,144,168,.5);padding:0 14px;margin-bottom:8px;margin-top:20px;}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-size:.85rem;font-weight:500;color:var(--on-surface-variant);cursor:pointer;transition:all .2s;text-decoration:none;margin-bottom:2px;position:relative;}
+        .nav-item:hover{background:rgba(99,102,241,.08);color:var(--on-surface);}.nav-item.active{background:rgba(99,102,241,.12);color:var(--primary);border:1px solid rgba(99,102,241,.2);}
+        .nav-item.active::before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--primary-container),var(--secondary));}
+        .nav-spacer{flex:1;}.nav-item.logout-btn{color:var(--error);}
+        .hamburger{display:none;position:fixed;top:16px;left:16px;z-index:60;width:40px;height:40px;border-radius:10px;background:var(--surface-solid);border:1px solid var(--outline);cursor:pointer;align-items:center;justify-content:center;}.hamburger span{display:block;width:18px;height:2px;background:var(--on-surface);border-radius:2px;}.hamburger span+span{margin-top:4px;}
 
-        .role-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
-        .role-chip {
-            background: var(--surface-high); border: 1px solid rgba(99,102,241,0.15);
-            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .role-chip:hover { border-color: var(--primary); color: var(--primary); }
+        .main{margin-left:260px;flex:1;padding:32px 40px;min-height:100vh;max-width:900px;}
+
+        /* Setup */
+        .setup-card{max-width:620px;margin:60px auto;background:var(--surface);backdrop-filter:blur(12px);border:1px solid var(--outline);border-radius:20px;padding:48px;text-align:center;position:relative;overflow:hidden;animation:fadeUp .5s ease;}
+        .setup-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--primary-container),var(--secondary),transparent);opacity:.6;}
+        .setup-card h1{font-size:1.8rem;font-weight:300;margin-bottom:8px;}.setup-card h1 span{font-weight:700;color:var(--primary);}
+        .setup-card > p{color:var(--on-surface-variant);margin-bottom:32px;line-height:1.6;}
+        .setup-card .label{font-family:'Space Grotesk';font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-surface-variant);margin-bottom:8px;text-align:left;}
+        .role-input{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--outline);border-radius:12px;padding:14px 20px;color:var(--on-surface);font-size:1rem;font-family:'JetBrains Mono';outline:none;transition:border-color .2s,box-shadow .2s;}
+        .role-input:focus{border-color:var(--primary-container);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+        .role-chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;}
+        .role-chip{background:var(--surface-high);border:1px solid var(--outline);padding:8px 18px;border-radius:24px;font-size:.82rem;cursor:pointer;transition:all .2s;}
+        .role-chip:hover{border-color:var(--primary);color:var(--primary);background:rgba(99,102,241,.05);}
+        .start-btn{width:100%;margin-top:24px;padding:16px;background:linear-gradient(135deg,var(--primary-container),#818cf8);color:#fff;border:none;border-radius:14px;font-family:'Space Grotesk';font-size:.9rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px var(--primary-glow);}
+        .start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px var(--primary-glow);}.start-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+        .start-btn .spinner-inline{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}}
+
+        /* Progress bar */
+        .progress-track{width:100%;height:6px;background:rgba(255,255,255,.04);border-radius:6px;margin-bottom:28px;overflow:hidden;}
+        .progress-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--primary-container),var(--secondary));transition:width .6s ease;}
 
         /* Interview view */
-        .interview-view { display: none; }
+        .interview-view{display:none;animation:fadeUp .4s ease;}
+        .interview-header{background:var(--surface);border:1px solid var(--outline);border-radius:18px;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+        .role-badge{font-family:'Space Grotesk';font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--secondary);}
+        .role-name{font-size:1.2rem;font-weight:700;margin-top:2px;}
+        .header-right{display:flex;align-items:center;gap:14px;}
+        .question-badge{font-family:'JetBrains Mono';font-size:.72rem;background:var(--surface-high);padding:6px 14px;border-radius:12px;color:var(--on-surface-variant);border:1px solid var(--outline);}
+        .timer-badge{font-family:'JetBrains Mono';font-size:.82rem;font-weight:700;padding:6px 14px;border-radius:12px;border:1px solid var(--outline);transition:color .3s,border-color .3s,background .3s;}
+        .timer-badge.normal{color:var(--secondary);border-color:rgba(78,222,163,.3);}
+        .timer-badge.warning{color:var(--tertiary);border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.06);}
+        .timer-badge.danger{color:var(--error);border-color:rgba(252,165,165,.3);background:rgba(252,165,165,.06);animation:timerPulse 1s ease infinite;}
+        @keyframes timerPulse{0%,100%{opacity:1;}50%{opacity:.6;}}
 
-        .interview-header {
-            background: var(--surface); border: 1px solid rgba(99,102,241,0.1); border-radius: 16px;
-            padding: 20px 28px; display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 32px;
-        }
-        .interview-header .role-badge { font-family: 'Space Grotesk'; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--secondary); }
-        .interview-header .role-name { font-size: 1.2rem; font-weight: 700; }
-        .question-badge {
-            font-family: 'JetBrains Mono'; font-size: 0.75rem; background: var(--surface-highest);
-            padding: 6px 14px; border-radius: 12px; color: var(--on-surface-variant);
-        }
+        .difficulty-badge{font-family:'Space Grotesk';font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:8px;font-weight:600;}
+        .difficulty-badge.easy{background:rgba(78,222,163,.12);color:var(--secondary);}.difficulty-badge.medium{background:rgba(251,191,36,.12);color:var(--tertiary);}.difficulty-badge.hard{background:rgba(252,165,165,.12);color:var(--error);}
 
-        .question-card {
-            background: var(--surface); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px;
-            padding: 32px; margin-bottom: 24px;
-        }
-        .question-text { font-size: 1.3rem; font-weight: 600; line-height: 1.5; margin-bottom: 12px; }
-        .question-context { font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--on-surface-variant); font-style: italic; }
+        .question-card{background:var(--surface);border:1px solid var(--outline);border-radius:18px;padding:32px;margin-bottom:20px;}
+        .question-label{font-family:'Space Grotesk';font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-surface-variant);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .question-text{font-size:1.2rem;font-weight:600;line-height:1.5;margin-bottom:10px;}
+        .question-context{font-family:'JetBrains Mono';font-size:.78rem;color:var(--on-surface-variant);font-style:italic;}
 
-        .answer-area {
-            background: var(--surface); border: 1px solid rgba(99,102,241,0.1); border-radius: 16px;
-            padding: 24px;
-        }
-        .answer-label { font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 12px; }
-        .answer-input {
-            width: 100%; min-height: 120px; background: var(--bg); border: 1px solid var(--outline);
-            border-radius: 12px; padding: 16px; color: var(--on-surface); font-family: 'Inter';
-            font-size: 0.9rem; outline: none; resize: vertical; transition: border-color 0.2s;
-        }
-        .answer-input:focus { border-color: var(--primary-container); }
-        .submit-answer-btn {
-            margin-top: 16px; padding: 14px 40px; background: var(--primary-container);
-            color: white; border: none; border-radius: 12px; font-family: 'Space Grotesk';
-            font-size: 0.85rem; font-weight: 600; text-transform: uppercase; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .submit-answer-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.3); }
-        .submit-answer-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .answer-area{background:var(--surface);border:1px solid var(--outline);border-radius:18px;padding:24px;}
+        .answer-label{font-family:'Space Grotesk';font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-surface-variant);margin-bottom:12px;}
+        .answer-input{width:100%;min-height:130px;background:rgba(0,0,0,.25);border:1px solid var(--outline);border-radius:12px;padding:16px;color:var(--on-surface);font-family:'Inter';font-size:.9rem;outline:none;resize:vertical;transition:border-color .2s;line-height:1.6;}
+        .answer-input:focus{border-color:var(--primary-container);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+        .answer-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+        .submit-answer-btn{padding:14px 36px;background:linear-gradient(135deg,var(--primary-container),#818cf8);color:#fff;border:none;border-radius:12px;font-family:'Space Grotesk';font-size:.85rem;font-weight:600;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px var(--primary-glow);}
+        .submit-answer-btn:hover{transform:translateY(-2px);}.submit-answer-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+        .answer-hint{font-size:.72rem;color:var(--on-surface-variant);}
 
         /* Feedback */
-        .feedback-card {
-            background: var(--surface); border: 1px solid rgba(78,222,163,0.2); border-radius: 16px;
-            padding: 24px; margin-top: 20px; display: none;
-        }
-        .feedback-card .score-big { font-size: 2rem; font-weight: 800; color: var(--secondary); }
-        .feedback-card .feedback-text { margin-top: 12px; font-size: 0.9rem; line-height: 1.6; color: var(--on-surface-variant); }
+        .feedback-card{background:var(--surface);border:1px solid rgba(78,222,163,.2);border-radius:18px;padding:24px;margin-top:20px;display:none;animation:fadeUp .4s ease;}
+        .feedback-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .score-big{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--secondary),#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .feedback-text{font-size:.88rem;line-height:1.65;color:var(--on-surface-variant);}
+        .next-btn{padding:14px 28px;background:linear-gradient(135deg,var(--primary-container),#818cf8);color:#fff;border:none;border-radius:12px;font-family:'Space Grotesk';font-size:.82rem;font-weight:600;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+        .next-btn:hover{transform:translateY(-2px);}
 
         /* Summary */
-        .summary-view { display: none; text-align: center; padding: 40px; }
-        .summary-view h2 { font-size: 1.8rem; margin-bottom: 16px; }
-        .summary-score { font-size: 3rem; font-weight: 800; color: var(--secondary); }
-        .summary-details { margin-top: 24px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .summary-view{display:none;text-align:center;padding:40px;animation:fadeUp .5s ease;}
+        .summary-view h2{font-size:1.8rem;margin-bottom:16px;font-weight:300;}.summary-view h2 span{font-weight:700;color:var(--primary);}
+        .summary-score{font-size:3.5rem;font-weight:800;background:linear-gradient(135deg,var(--secondary),#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .summary-details{margin-top:24px;text-align:left;max-width:620px;margin-left:auto;margin-right:auto;}
+        .summary-card{background:var(--surface);border:1px solid var(--outline);border-radius:16px;padding:24px;margin-top:16px;}
+        .summary-card pre{white-space:pre-wrap;font-size:.88rem;line-height:1.6;color:var(--on-surface-variant);font-family:'Inter',sans-serif;}
+        .restart-btn{display:inline-block;margin-top:28px;padding:14px 36px;background:linear-gradient(135deg,var(--primary-container),#818cf8);color:#fff;border:none;border-radius:14px;font-family:'Space Grotesk';font-size:.88rem;font-weight:600;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px var(--primary-glow);text-decoration:none;}
+        .restart-btn:hover{transform:translateY(-2px);}
 
-        .msg { font-size: 0.85rem; margin-top: 12px; text-align: center; min-height: 20px; }
-        .msg.error { color: var(--error); }
-        .msg.success { color: var(--secondary); }
+        /* Confetti */
+        .confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden;}
+        .confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall 3s ease forwards;}
+        @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
 
-        .loading { text-align: center; padding: 20px; }
-        .spinner { width: 24px; height: 24px; border: 3px solid var(--outline); border-top-color: var(--primary-container); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .msg{font-size:.82rem;min-height:20px;}.msg.error{color:var(--error);}.msg.success{color:var(--secondary);}
+
+        @media(max-width:768px){.sidebar{transform:translateX(-100%);transition:transform .3s;}.sidebar.open{transform:translateX(0);}.hamburger{display:flex;}.main{margin-left:0;padding:24px 16px;padding-top:60px;}.header-right{flex-direction:column;gap:6px;align-items:flex-end;}}
     </style>
 </head>
 <body>
+    <div class="offline-banner" id="offline-banner">⚡ You're offline</div>
+    <div class="toast-container" id="toast-container"></div>
+    <div class="confetti-container" id="confetti"></div>
+    <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+
     <nav class="sidebar">
-        <div class="brand">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4edea3" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
-            </svg>
-            <div><h2>NEXORA</h2><small>Neural Intelligence</small></div>
-        </div>
-        <a href="/student" class="nav-item">🏠 Home</a>
-        <a href="/resume" class="nav-item">📄 Resume Scan</a>
-        <a href="/coach" class="nav-item">🤖 My Coach</a>
-        <a href="/interview" class="nav-item active">🎤 Mock Interview</a>
-        <a href="/roadmap" class="nav-item">🗺️ My Roadmap</a>
-        <div class="nav-spacer"></div>
-        <a href="#" class="nav-item logout-btn" onclick="logout()">🚪 Logout</a>
+        <div class="brand"><div class="brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/></svg></div><div><h2>NEXORA</h2><small>Neural Intelligence</small></div></div>
+        <div class="nav-section-label">Navigation</div>
+        <a href="/student" class="nav-item">🏠 Home</a><a href="/resume" class="nav-item">📄 Resume Scan</a><a href="/coach" class="nav-item">🧠 AI Coach</a><a href="/interview" class="nav-item active">🎤 Mock Interview</a><a href="/roadmap" class="nav-item">🗺️ My Roadmap</a>
+        <div class="nav-spacer"></div><a href="#" class="nav-item logout-btn" onclick="logout();return false;">🚪 Logout</a>
     </nav>
 
     <div class="main">
-        <!-- SETUP VIEW -->
+        <!-- SETUP -->
         <div id="setup-view" class="setup-card">
             <h1>Start a <span>Mock Interview</span></h1>
-            <p>Powered by Google Gemini 1.5 Flash. You'll get 5 questions<br>evaluated across technical depth, communication, and problem-solving.</p>
+            <p>Powered by Google Gemini. You'll get 5 questions evaluated across technical depth, communication, and problem-solving.</p>
             <div class="label">Target Role</div>
             <input type="text" id="role-input" class="role-input" placeholder="e.g., Software Engineer">
             <div class="role-chips">
@@ -163,246 +137,179 @@
                 <div class="role-chip" onclick="setRole('Frontend Developer')">Frontend Dev</div>
                 <div class="role-chip" onclick="setRole('Backend Developer')">Backend Dev</div>
                 <div class="role-chip" onclick="setRole('DevOps Engineer')">DevOps</div>
+                <div class="role-chip" onclick="setRole('ML Engineer')">ML Engineer</div>
             </div>
-            <button class="start-btn" onclick="startInterview()">Begin Interview Session →</button>
+            <button class="start-btn" id="start-btn" onclick="startInterview()">Begin Interview Session →</button>
             <p id="setup-msg" class="msg"></p>
         </div>
 
-        <!-- INTERVIEW VIEW -->
+        <!-- INTERVIEW -->
         <div id="interview-view" class="interview-view">
+            <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:20%;"></div></div>
             <div class="interview-header">
-                <div>
-                    <div class="role-badge">CURRENT INTERVIEW</div>
-                    <div class="role-name" id="role-display">Software Engineer</div>
+                <div><div class="role-badge">CURRENT INTERVIEW</div><div class="role-name" id="role-display">Software Engineer</div></div>
+                <div class="header-right">
+                    <span class="question-badge" id="question-counter">Q 1/5</span>
+                    <span class="timer-badge normal" id="timer">05:00</span>
                 </div>
-                <div class="question-badge" id="question-counter">Question 1/5</div>
             </div>
 
             <div class="question-card">
+                <div class="question-label" id="question-label"><span class="difficulty-badge medium" id="diff-badge">MEDIUM</span></div>
                 <div class="question-text" id="question-text">Loading question...</div>
                 <div class="question-context" id="question-context"></div>
             </div>
 
             <div class="answer-area">
                 <div class="answer-label">Your Response</div>
-                <textarea id="answer-input" class="answer-input" placeholder="Type your answer here..."></textarea>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <textarea id="answer-input" class="answer-input" placeholder="Type your detailed answer here..."></textarea>
+                <div class="answer-actions">
                     <button id="submit-answer" class="submit-answer-btn" onclick="submitAnswer()">Submit Answer</button>
-                    <span id="answer-msg" class="msg"></span>
+                    <span class="answer-hint" id="answer-hint">Min 20 characters</span>
                 </div>
             </div>
 
             <div class="feedback-card" id="feedback-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div class="answer-label">Evaluation Score</div>
-                        <div class="score-big" id="feedback-score">-/10</div>
-                    </div>
-                    <button class="submit-answer-btn" id="next-btn" onclick="nextQuestion()" style="display:none;">Next Question →</button>
+                <div class="feedback-header">
+                    <div><div class="answer-label">Evaluation Score</div><div class="score-big" id="feedback-score">—/10</div></div>
+                    <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display:none;">Next Question →</button>
                 </div>
                 <div class="feedback-text" id="feedback-text"></div>
             </div>
         </div>
 
-        <!-- SUMMARY VIEW -->
+        <!-- SUMMARY -->
         <div id="summary-view" class="summary-view">
-            <h2>Interview Complete ✓</h2>
+            <h2>Interview <span>Complete</span> ✓</h2>
             <div class="summary-score" id="final-score">0/10</div>
-            <p style="color: var(--on-surface-variant); margin-top: 8px;">Overall Average Score</p>
+            <p style="color:var(--on-surface-variant);margin-top:8px;">Overall Average Score</p>
             <div class="summary-details" id="summary-details"></div>
-            <button class="start-btn" style="max-width: 300px; margin: 32px auto;" onclick="location.reload()">Start New Interview</button>
+            <button class="restart-btn" onclick="location.reload()">Start New Interview</button>
         </div>
     </div>
 
     <script>
-        const API = '';
-        const token = localStorage.getItem('nexora_token');
-        if (!token) window.location.href = '/login';
+        function showToast(m,t){t=t||'info';var c=document.getElementById('toast-container'),e=document.createElement('div');e.className='toast '+t;e.textContent=m;c.appendChild(e);setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e);},4200);}
+        function updateOnlineStatus(){document.getElementById('offline-banner').classList.toggle('visible',!navigator.onLine);}
+        window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);updateOnlineStatus();
+        function safeGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+        function safeRemove(k){try{localStorage.removeItem(k);}catch(e){}}
+        function nexoraFetch(u,o,r){if(r===undefined)r=2;var c=new AbortController();var t=setTimeout(function(){c.abort();},45000);o=o||{};o.signal=c.signal;return fetch(u,o).then(function(res){clearTimeout(t);if(res.status===429){showToast('Rate limited','error');throw new Error('Rate limited');}return res;}).catch(function(err){clearTimeout(t);if(r>0&&err.name!=='AbortError'){var d=(3-r)*2000+500;return new Promise(function(resolve){setTimeout(resolve,d);}).then(function(){return nexoraFetch(u,o,r-1);});}throw err;});}
+        function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-        let sessionId = null;
-        let currentQuestion = 0;
-        let currentRole = '';
+        var API='',token=safeGet('nexora_token');
+        if(!token)window.location.href='/login';
+        var sessionId=null,currentQuestion=0,currentRole='',timerInterval=null,timeLeft=300;
 
-        /** API returns question as either a string or { question, type, difficulty, topic, ... } */
-        function getQuestionText(q) {
-            if (q == null || q === '') return '';
-            if (typeof q === 'string') return q;
-            if (typeof q === 'object' && q.question != null) return String(q.question);
-            return '';
-        }
-        function getQuestionMeta(q) {
-            if (q == null || typeof q !== 'object') return '';
-            var parts = [];
-            if (q.type) parts.push(q.type);
-            if (q.difficulty) parts.push(q.difficulty);
-            if (q.topic) parts.push(q.topic);
-            return parts.join(' · ');
-        }
-        function evaluationScore(feedbackPayload) {
-            if (!feedbackPayload || !feedbackPayload.scores) return null;
-            var a = feedbackPayload.scores.average;
-            return a != null ? a : null;
-        }
-        function evaluationFeedbackText(feedbackPayload) {
-            if (!feedbackPayload) return '';
-            var inner = feedbackPayload.feedback || {};
-            if (inner.overall_comment) return inner.overall_comment;
-            var lines = [];
-            (inner.strengths || []).forEach(function (s) { lines.push('Strength: ' + s); });
-            (inner.improvements || []).forEach(function (s) { lines.push('Improve: ' + s); });
-            return lines.join('\n') || 'Evaluation complete.';
-        }
+        function getQuestionText(q){if(!q||q==='')return'';if(typeof q==='string')return q;if(typeof q==='object'&&q.question!=null)return String(q.question);return'';}
+        function getQuestionMeta(q){if(!q||typeof q!=='object')return'';var p=[];if(q.type)p.push(q.type);if(q.difficulty)p.push(q.difficulty);if(q.topic)p.push(q.topic);return p.join(' · ');}
+        function getDifficulty(q){if(!q||typeof q!=='object')return'medium';return(q.difficulty||'medium').toLowerCase();}
+        function evaluationScore(f){if(!f||!f.scores)return null;return f.scores.average!=null?f.scores.average:null;}
+        function evaluationFeedbackText(f){if(!f)return'';var inner=f.feedback||{};if(inner.overall_comment)return inner.overall_comment;var lines=[];(inner.strengths||[]).forEach(function(s){lines.push('✅ '+s);});(inner.improvements||[]).forEach(function(s){lines.push('💡 '+s);});return lines.join('\n')||'Evaluation complete.';}
+        function setRole(r){document.getElementById('role-input').value=r;}
 
-        function setRole(role) { document.getElementById('role-input').value = role; }
+        // Timer
+        function startTimer(){timeLeft=300;updateTimerDisplay();timerInterval=setInterval(function(){timeLeft--;updateTimerDisplay();if(timeLeft<=0){clearInterval(timerInterval);showToast('Time\'s up! Submit your answer.','error');}},1000);}
+        function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+        function updateTimerDisplay(){var m=Math.floor(timeLeft/60),s=timeLeft%60;var el=document.getElementById('timer');el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;if(timeLeft>120)el.className='timer-badge normal';else if(timeLeft>30)el.className='timer-badge warning';else el.className='timer-badge danger';}
 
-        async function startInterview() {
-            const role = document.getElementById('role-input').value.trim();
-            if (!role) return showMsg('setup-msg', 'Please enter a target role', 'error');
+        // Confetti
+        function fireConfetti(){var container=document.getElementById('confetti');var colors=['#6366F1','#818cf8','#4edea3','#fbbf24','#a5b4fc','#f472b6'];for(var i=0;i<60;i++){var el=document.createElement('div');el.className='confetti';el.style.left=Math.random()*100+'%';el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.animationDuration=(2+Math.random()*2)+'s';el.style.animationDelay=Math.random()+'s';el.style.width=(4+Math.random()*6)+'px';el.style.height=(4+Math.random()*6)+'px';container.appendChild(el);}setTimeout(function(){container.innerHTML='';},5000);}
 
-            const btn = document.querySelector('.start-btn');
-            btn.disabled = true; btn.textContent = 'Starting session...';
-            currentRole = role;
-
-            try {
-                const r = await fetch(`${API}/api/interview/start`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role })
-                });
-                if (r.status === 401) { window.location.href = '/login'; return; }
-                const data = await r.json();
-                if (data.success) {
-                    sessionId = data.session_id;
-                    currentQuestion = 1;
-                    document.getElementById('setup-view').style.display = 'none';
-                    document.getElementById('interview-view').style.display = 'block';
-                    document.getElementById('role-display').textContent = role;
-                    document.getElementById('question-counter').textContent = `Question ${currentQuestion}/5`;
-                    document.getElementById('question-text').textContent =
-                        getQuestionText(data.question) || 'Question loading...';
-                    document.getElementById('question-context').textContent =
-                        getQuestionMeta(data.question) || '';
-                } else {
-                    showMsg('setup-msg', data.detail || data.error || 'Failed to start', 'error');
-                }
-            } catch (e) {
-                showMsg('setup-msg', `Error: ${e.message}`, 'error');
-            }
-            btn.disabled = false; btn.textContent = 'Begin Interview Session →';
+        async function startInterview(){
+            var role=document.getElementById('role-input').value.trim();
+            if(!role){showToast('Please enter a target role','error');return;}
+            var btn=document.getElementById('start-btn');
+            btn.disabled=true;btn.innerHTML='<span class="spinner-inline"></span>Starting session...';
+            currentRole=role;
+            try{
+                var r=await nexoraFetch(API+'/api/interview/start',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({role:role})});
+                if(r.status===401){showToast('Session expired','error');setTimeout(function(){window.location.href='/login';},1200);return;}
+                var data=await r.json();
+                if(data.success){
+                    sessionId=data.session_id;currentQuestion=1;
+                    document.getElementById('setup-view').style.display='none';
+                    document.getElementById('interview-view').style.display='block';
+                    document.getElementById('role-display').textContent=role;
+                    document.getElementById('question-counter').textContent='Q '+currentQuestion+'/5';
+                    document.getElementById('progress-fill').style.width='20%';
+                    document.getElementById('question-text').textContent=getQuestionText(data.question)||'Question loading...';
+                    document.getElementById('question-context').textContent=getQuestionMeta(data.question)||'';
+                    var diff=getDifficulty(data.question);
+                    document.getElementById('diff-badge').textContent=diff.toUpperCase();
+                    document.getElementById('diff-badge').className='difficulty-badge '+diff;
+                    startTimer();
+                }else{showToast(data.detail||data.error||'Failed to start','error');}
+            }catch(e){showToast('Error: '+e.message,'error');}
+            btn.disabled=false;btn.textContent='Begin Interview Session →';
         }
 
-        async function submitAnswer() {
-            const answer = document.getElementById('answer-input').value.trim();
-            if (!answer) return showMsg('answer-msg', 'Write your answer first', 'error');
-            if (answer.length < 20) return showMsg('answer-msg', 'Answer too short (min 20 chars)', 'error');
-
-            const btn = document.getElementById('submit-answer');
-            btn.disabled = true; btn.textContent = 'Evaluating...';
-
-            try {
-                const r = await fetch(`${API}/api/interview/answer`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ session_id: sessionId, answer })
-                });
-                if (r.status === 401) { window.location.href = '/login'; return; }
-                const data = await r.json();
-
-                if (data.success) {
-                    // Show feedback (backend sends eval_data as "feedback")
-                    document.getElementById('feedback-card').style.display = 'block';
-                    var ev = data.feedback;
-                    var sc = evaluationScore(ev);
-                    document.getElementById('feedback-score').textContent =
-                        (sc != null ? sc : '?') + '/10';
-                    document.getElementById('feedback-text').textContent =
-                        evaluationFeedbackText(ev);
-
-                    if (data.is_complete) {
-                        document.getElementById('next-btn').style.display = 'none';
-                        setTimeout(function () { showSummary(data); }, 2000);
-                    } else {
-                        document.getElementById('next-btn').style.display = 'inline-block';
-                        var nq = data.next_question;
-                        document.getElementById('next-btn').dataset.nextQuestionText = getQuestionText(nq);
-                        document.getElementById('next-btn').dataset.nextQuestionMeta = getQuestionMeta(nq);
+        async function submitAnswer(){
+            var answer=document.getElementById('answer-input').value.trim();
+            if(!answer){showToast('Write your answer first','error');return;}
+            if(answer.length<20){showToast('Answer too short (min 20 chars)','error');return;}
+            var btn=document.getElementById('submit-answer');
+            btn.disabled=true;btn.textContent='Evaluating...';
+            stopTimer();
+            try{
+                var r=await nexoraFetch(API+'/api/interview/answer',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId,answer:answer})});
+                if(r.status===401){showToast('Session expired','error');setTimeout(function(){window.location.href='/login';},1200);return;}
+                var data=await r.json();
+                if(data.success){
+                    document.getElementById('feedback-card').style.display='block';
+                    var ev=data.feedback;var sc=evaluationScore(ev);
+                    document.getElementById('feedback-score').textContent=(sc!=null?sc:'?')+'/10';
+                    document.getElementById('feedback-text').textContent=evaluationFeedbackText(ev);
+                    if(sc!=null&&sc>=7)fireConfetti();
+                    if(data.is_complete){
+                        document.getElementById('next-btn').style.display='none';
+                        setTimeout(function(){showSummary(data);},2000);
+                    }else{
+                        document.getElementById('next-btn').style.display='inline-block';
+                        var nq=data.next_question;
+                        document.getElementById('next-btn').dataset.nextQuestionText=getQuestionText(nq);
+                        document.getElementById('next-btn').dataset.nextQuestionMeta=getQuestionMeta(nq);
+                        document.getElementById('next-btn').dataset.nextDifficulty=getDifficulty(nq);
                     }
-                } else {
-                    showMsg('answer-msg', data.detail || 'Evaluation failed', 'error');
-                }
-            } catch (e) {
-                showMsg('answer-msg', `Error: ${e.message}`, 'error');
-            }
-            btn.disabled = false; btn.textContent = 'Submit Answer';
+                }else{showToast(data.detail||'Evaluation failed','error');}
+            }catch(e){showToast('Error: '+e.message,'error');}
+            btn.disabled=false;btn.textContent='Submit Answer';
         }
 
-        function nextQuestion() {
+        function nextQuestion(){
             currentQuestion++;
-            const btn = document.getElementById('next-btn');
-            const nextQ = btn.dataset.nextQuestionText || '';
-            const nextCtx = btn.dataset.nextQuestionMeta || '';
-
-            document.getElementById('question-counter').textContent = `Question ${currentQuestion}/5`;
-            document.getElementById('question-text').textContent = nextQ || 'Loading next question...';
-            document.getElementById('question-context').textContent = nextCtx || '';
-            document.getElementById('answer-input').value = '';
-            document.getElementById('feedback-card').style.display = 'none';
-            btn.style.display = 'none';
-            showMsg('answer-msg', '', '');
+            var btn=document.getElementById('next-btn');
+            document.getElementById('question-counter').textContent='Q '+currentQuestion+'/5';
+            document.getElementById('progress-fill').style.width=(currentQuestion*20)+'%';
+            document.getElementById('question-text').textContent=btn.dataset.nextQuestionText||'Loading...';
+            document.getElementById('question-context').textContent=btn.dataset.nextQuestionMeta||'';
+            var diff=btn.dataset.nextDifficulty||'medium';
+            document.getElementById('diff-badge').textContent=diff.toUpperCase();
+            document.getElementById('diff-badge').className='difficulty-badge '+diff;
+            document.getElementById('answer-input').value='';
+            document.getElementById('feedback-card').style.display='none';
+            btn.style.display='none';
+            startTimer();
         }
 
-        async function showSummary(data) {
-            document.getElementById('interview-view').style.display = 'none';
-            document.getElementById('summary-view').style.display = 'block';
-
-            const avg = data.session_score != null ? data.session_score
-                : (data.summary && data.summary.average_score != null ? data.summary.average_score : null);
-            document.getElementById('final-score').textContent =
-                (avg != null ? Number(avg).toFixed(1) : '?') + '/10';
-
-            try {
-                const r = await fetch(`${API}/api/interview/summary/${sessionId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const summary = await r.json();
-                if (summary.success) {
-                    var text = summary.summary || '';
-                    if (!text && summary.session_score != null) {
-                        text = 'Session score: ' + summary.session_score + '/10';
-                    }
-                    var wrap = document.createElement('div');
-                    wrap.style.marginTop = '20px';
-                    wrap.style.background = 'var(--surface)';
-                    wrap.style.borderRadius = '16px';
-                    wrap.style.padding = '24px';
-                    wrap.style.border = '1px solid rgba(99,102,241,0.1)';
-                    var pre = document.createElement('pre');
-                    pre.style.whiteSpace = 'pre-wrap';
-                    pre.style.fontSize = '0.9rem';
-                    pre.style.lineHeight = '1.6';
-                    pre.style.color = 'var(--on-surface-variant)';
-                    pre.style.fontFamily = 'Inter, sans-serif';
-                    pre.textContent = text;
-                    wrap.appendChild(pre);
-                    document.getElementById('summary-details').innerHTML = '';
-                    document.getElementById('summary-details').appendChild(wrap);
+        async function showSummary(data){
+            document.getElementById('interview-view').style.display='none';
+            document.getElementById('summary-view').style.display='block';
+            var avg=data.session_score!=null?data.session_score:(data.summary&&data.summary.average_score!=null?data.summary.average_score:null);
+            document.getElementById('final-score').textContent=(avg!=null?Number(avg).toFixed(1):'?')+'/10';
+            if(avg!=null&&avg>=7)fireConfetti();
+            try{
+                var r=await nexoraFetch(API+'/api/interview/summary/'+sessionId,{headers:{'Authorization':'Bearer '+token}});
+                var summary=await r.json();
+                if(summary.success){
+                    var text=summary.summary||'';
+                    if(!text&&summary.session_score!=null)text='Session score: '+summary.session_score+'/10';
+                    document.getElementById('summary-details').innerHTML='<div class="summary-card"><pre>'+esc(text)+'</pre></div>';
                 }
-            } catch (e) {
-                console.log('Summary fetch error:', e);
-            }
+            }catch(e){console.log('Summary fetch error:',e);}
         }
 
-        function showMsg(id, text, type) {
-            const el = document.getElementById(id);
-            el.textContent = text;
-            el.className = `msg ${type}`;
-        }
-
-        function logout() {
-            localStorage.removeItem('nexora_token');
-            localStorage.removeItem('nexora_user');
-            window.location.href = '/login';
-        }
+        function logout(){safeRemove('nexora_token');safeRemove('nexora_user');showToast('Logged out','info');setTimeout(function(){window.location.href='/login';},500);}
     </script>
 </body>
 </html>
