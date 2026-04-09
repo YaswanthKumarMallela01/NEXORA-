@@ -93,6 +93,7 @@ def get_cors_origins() -> list[str]:
     origins = [
         settings.NEXT_PUBLIC_APP_URL,
         "https://nexora.vercel.app",
+        "https://nexora-backend.onrender.com",
     ]
 
     # Add localhost for development

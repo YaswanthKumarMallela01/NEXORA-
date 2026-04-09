@@ -4,7 +4,7 @@ FastAPI server with multi-agent AI, RAG pipeline, Supabase integration,
 and Stitch-generated Neural Minimalism frontend.
 
 Run locally:  .venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000
-Deploy:        Vercel serverless (see vercel.json)
+Deploy:        Render.com (see render.yaml / Procfile)
 """
 
 import logging
