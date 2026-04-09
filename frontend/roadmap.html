@@ -1,368 +1,245 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>NEXORA | My Roadmap</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<style id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "secondary-container": "#00a572",
-                        "on-tertiary-fixed": "#301400",
-                        "tertiary-fixed-dim": "#ffb783",
-                        "background": "#0e1322",
-                        "surface-container": "#1a1f2f",
-                        "error-container": "#93000a",
-                        "primary": "#c0c1ff",
-                        "surface-container-low": "#161b2b",
-                        "surface-dim": "#0e1322",
-                        "on-surface": "#dee1f7",
-                        "on-primary-fixed": "#07006c",
-                        "secondary-fixed": "#6ffbbe",
-                        "tertiary-container": "#d97721",
-                        "outline-variant": "#464554",
-                        "on-background": "#dee1f7",
-                        "tertiary-fixed": "#ffdcc5",
-                        "on-secondary-fixed-variant": "#005236",
-                        "secondary-fixed-dim": "#4edea3",
-                        "on-secondary-fixed": "#002113",
-                        "error": "#ffb4ab",
-                        "on-tertiary-container": "#452000",
-                        "on-tertiary-fixed-variant": "#703700",
-                        "inverse-primary": "#494bd6",
-                        "surface-container-highest": "#2f3445",
-                        "surface-tint": "#c0c1ff",
-                        "primary-container": "#8083ff",
-                        "inverse-on-surface": "#2b3040",
-                        "on-secondary": "#003824",
-                        "primary-fixed": "#e1e0ff",
-                        "surface-container-high": "#25293a",
-                        "secondary": "#4edea3",
-                        "on-primary-container": "#0d0096",
-                        "primary-fixed-dim": "#c0c1ff",
-                        "inverse-surface": "#dee1f7",
-                        "on-tertiary": "#4f2500",
-                        "on-primary": "#1000a9",
-                        "on-secondary-container": "#00311f",
-                        "surface-bright": "#343949",
-                        "on-primary-fixed-variant": "#2f2ebe",
-                        "tertiary": "#ffb783",
-                        "on-error": "#690005",
-                        "surface-variant": "#2f3445",
-                        "outline": "#908fa0",
-                        "on-surface-variant": "#c7c4d7",
-                        "on-error-container": "#ffdad6",
-                        "surface-container-lowest": "#090e1c",
-                        "surface": "#0e1322"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "fontFamily": {
-                        "headline": ["Inter"],
-                        "body": ["Inter"],
-                        "label": ["Space Grotesk"]
-                    }
-                },
-            },
-        }
-    </script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXORA | My Roadmap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        .dot-grid {
-            background-image: radial-gradient(circle, rgba(192, 193, 255, 0.05) 1px, transparent 1px);
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0e1322; --surface: #1a1f2f; --surface-high: #25293a; --surface-highest: #2f3445;
+            --primary: #c0c1ff; --primary-container: #6366F1; --secondary: #4edea3;
+            --on-surface: #dee1f7; --on-surface-variant: #908fa0; --outline: #464554;
+            --error: #ffb4ab; --tertiary: #ffb783;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--on-surface);
+            min-height: 100vh; display: flex;
+            background-image: radial-gradient(rgba(99,102,241,0.04) 1px, transparent 1px);
             background-size: 24px 24px;
         }
-        .neural-wave {
-            display: flex;
-            align-items: center;
-            gap: 2px;
+        .sidebar {
+            width: 240px; min-height: 100vh; background: var(--surface);
+            border-right: 1px solid rgba(99,102,241,0.1); padding: 24px 16px;
+            display: flex; flex-direction: column; position: fixed; left: 0; top: 0;
         }
-        .neural-wave span {
-            width: 2px;
-            background: #c0c1ff;
-            border-radius: 1px;
+        .sidebar .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+        .sidebar .brand h2 { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
+        .sidebar .brand small { display: block; font-family: 'Space Grotesk'; font-size: 0.6rem; color: var(--secondary); letter-spacing: 0.08em; text-transform: uppercase; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; color: var(--on-surface-variant); cursor: pointer; transition: all 0.2s; text-decoration: none; margin-bottom: 4px; }
+        .nav-item:hover { background: var(--surface-high); color: var(--on-surface); }
+        .nav-item.active { background: var(--surface-highest); color: var(--on-surface); border-left: 3px solid var(--primary-container); }
+        .nav-spacer { flex: 1; }
+        .logout-btn { color: var(--error); }
+
+        .main { margin-left: 240px; flex: 1; padding: 32px 40px; }
+
+        .page-header { margin-bottom: 32px; }
+        .page-header .label { font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); }
+        .page-header h1 { font-size: 2rem; font-weight: 300; margin-top: 4px; }
+        .page-header h1 span { font-weight: 700; }
+        .page-header p { color: var(--on-surface-variant); font-size: 0.85rem; margin-top: 8px; }
+
+        .stats-row { display: flex; gap: 16px; margin-bottom: 32px; }
+        .stat-card {
+            background: var(--surface); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px;
+            padding: 20px 28px; flex: 1;
         }
-        .luminous-border {
-            border: 1px solid rgba(192, 193, 255, 0.15);
-            transition: all 0.3s ease;
+        .stat-card .stat-label { font-family: 'Space Grotesk'; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); }
+        .stat-card .stat-value { font-size: 1.8rem; font-weight: 800; margin-top: 4px; }
+        .stat-card .stat-value.green { color: var(--secondary); }
+        .stat-card .stat-value.orange { color: var(--tertiary); }
+        .stat-card .stat-value.purple { color: var(--primary); }
+
+        .filter-row { display: flex; gap: 8px; margin-bottom: 24px; }
+        .filter-btn {
+            background: var(--surface); border: 1px solid var(--outline); border-radius: 20px;
+            padding: 8px 20px; font-size: 0.8rem; color: var(--on-surface-variant);
+            cursor: pointer; transition: all 0.2s; font-family: 'Inter';
         }
-        .luminous-border:hover {
-            border-color: rgba(192, 193, 255, 0.4);
-            box-shadow: 0 0 20px rgba(192, 193, 255, 0.05);
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .filter-btn.active { background: var(--primary-container); border-color: var(--primary-container); color: white; }
+
+        .task-card {
+            background: var(--surface); border: 1px solid rgba(99,102,241,0.1); border-radius: 16px;
+            padding: 20px 24px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px;
+            transition: border-color 0.2s, transform 0.2s;
         }
-        .glass-panel {
-            background: rgba(47, 52, 69, 0.4);
-            backdrop-filter: blur(20px);
+        .task-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-1px); }
+
+        .task-checkbox {
+            width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--outline);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 0.8rem; transition: all 0.2s; flex-shrink: 0;
         }
+        .task-checkbox.completed { background: var(--secondary); border-color: var(--secondary); color: #000; }
+        .task-checkbox.in_progress { background: var(--tertiary); border-color: var(--tertiary); color: #000; }
+
+        .task-info { flex: 1; }
+        .task-title { font-weight: 600; font-size: 0.9rem; }
+        .task-title.completed { text-decoration: line-through; opacity: 0.5; }
+        .task-meta { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--on-surface-variant); margin-top: 4px; }
+
+        .task-status-badge {
+            font-family: 'Space Grotesk'; font-size: 0.65rem; letter-spacing: 0.05em;
+            padding: 4px 12px; border-radius: 8px; text-transform: uppercase;
+        }
+        .task-status-badge.pending { background: rgba(192,193,255,0.1); color: var(--primary); }
+        .task-status-badge.in_progress { background: rgba(255,183,131,0.15); color: var(--tertiary); }
+        .task-status-badge.completed { background: rgba(78,222,163,0.15); color: var(--secondary); }
+
+        .empty-state { text-align: center; padding: 60px; color: var(--on-surface-variant); }
+        .empty-state h3 { font-weight: 400; margin-bottom: 8px; }
+
+        .loading { text-align: center; padding: 40px; color: var(--on-surface-variant); }
+        .spinner { width: 28px; height: 28px; border: 3px solid var(--outline); border-top-color: var(--primary-container); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-background text-on-surface font-body selection:bg-primary/30 selection:text-primary">
-<div class="dot-grid fixed inset-0 z-0 pointer-events-none"></div>
-<!-- SideNavBar -->
-<aside class="h-screen w-64 fixed left-0 top-0 border-r border-[#25293a] flex flex-col h-full py-8 px-4 bg-[#0e1322] dark:bg-[#0e1322] z-50">
-<div class="mb-12 px-4">
-<h1 class="text-2xl font-black tracking-tighter text-[#c0c1ff]">NEXORA</h1>
-<p class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-[#dee1f7]/40 mt-1">Neural Intelligence</p>
-</div>
-<nav class="flex-1 space-y-2">
-<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f] group" href="#">
-<span class="material-symbols-outlined text-xl">home</span>
-<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Home</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f] group" href="#">
-<span class="material-symbols-outlined text-xl">psychology</span>
-<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">My Coach</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f] group" href="#">
-<span class="material-symbols-outlined text-xl">mic</span>
-<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Mock Interview</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#c0c1ff] font-bold border-r-2 border-[#c0c1ff] bg-[#1a1f2f] group" href="#">
-<span class="material-symbols-outlined text-xl">alt_route</span>
-<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">My Roadmap</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f] group" href="#">
-<span class="material-symbols-outlined text-xl">leaderboard</span>
-<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Progress</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#dee1f7]/60 font-medium hover:text-[#dee1f7] hover:bg-[#1a1f2f] group" href="#">
-<span class="material-symbols-outlined text-xl">settings</span>
-<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest">Settings</span>
-</a>
-</nav>
-<div class="mt-auto border-t border-[#25293a] pt-6 px-4">
-<div class="flex items-center gap-3 group cursor-pointer">
-<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden border border-primary/20">
-<img alt="User" class="w-full h-full object-cover" data-alt="minimalist user avatar profile picture with soft blue lighting and technical interface overlay" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB39Oj3H8FNo-c3aA0aY2U7gNRCUx2X5mDAoHH02CXfqXdFrpeV2lCzVwqFSmITbuB83wcLObLW1Zx2UmkFwpGC223LWYw4H3T9TPNemHfuADd6HjnVFBDVYweatXsWbcig6avq4BdNGGo-WrczQgvUNHb-fm0mvdztQlsS-qROoY6v6QW3_RAddQRSRP1i1yS1D3Kf0ggBCncu_yZkOabXqj4X_tLM5Du21lZ6atG513VMISbQPMdMYfUePecCU0mw7a9t2UIcNHA"/>
-</div>
-<div>
-<p class="text-xs font-bold text-on-surface">Alex Rivera</p>
-<p class="text-[10px] font-['JetBrains_Mono'] text-primary/60">Tier: Neural Pro</p>
-</div>
-</div>
-</div>
-</aside>
-<!-- TopAppBar -->
-<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-[#0e1322]/80 backdrop-blur-xl flex justify-end items-center px-8 gap-6 w-full">
-<div class="flex items-center gap-2 mr-auto bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/10">
-<span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary/80">AI Synthesis Active</span>
-</div>
-<div class="flex items-center gap-6 text-[#dee1f7]/70">
-<span class="material-symbols-outlined hover:text-[#c0c1ff] cursor-pointer transition-all duration-300 scale-97">timer</span>
-<span class="material-symbols-outlined hover:text-[#c0c1ff] cursor-pointer transition-all duration-300 scale-97">workspace_premium</span>
-<span class="material-symbols-outlined hover:text-[#c0c1ff] cursor-pointer transition-all duration-300 scale-97">graphic_eq</span>
-</div>
-</header>
-<!-- Main Content -->
-<main class="ml-64 pt-24 pb-20 px-12 relative z-10">
-<!-- Header Section -->
-<div class="max-w-6xl mx-auto mb-20 flex justify-between items-end">
-<div>
-<div class="flex items-center gap-4 mb-4">
-<span class="font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-secondary bg-secondary/10 px-3 py-1 rounded-full">Path Optimization v2.4</span>
-<div class="neural-wave h-4">
-<span class="h-2"></span>
-<span class="h-4"></span>
-<span class="h-3"></span>
-</div>
-</div>
-<h2 class="text-6xl font-bold font-headline tracking-tighter text-on-surface mb-2">My Roadmap</h2>
-<p class="text-on-surface-variant font-['JetBrains_Mono'] text-sm">Target: Senior Full-Stack Architect • Estimated Arrival: 12 Weeks</p>
-</div>
-<div class="flex gap-4">
-<button class="flex items-center gap-2 bg-surface-container hover:bg-surface-container-high text-on-surface px-6 py-3 rounded-xl font-['JetBrains_Mono'] text-xs uppercase tracking-widest transition-all luminous-border group active:scale-95">
-<span class="material-symbols-outlined text-sm group-hover:rotate-12 transition-transform">edit_calendar</span>
-                    Modify Structure
-                </button>
-<button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl font-['JetBrains_Mono'] text-xs uppercase tracking-widest font-bold transition-all hover:translate-y-[-2px] active:scale-95 shadow-lg shadow-primary/10">
-<span class="material-symbols-outlined text-sm">refresh</span>
-                    Regenerate AI
-                </button>
-</div>
-</div>
-<!-- Roadmap Timeline -->
-<div class="max-w-4xl mx-auto relative">
-<!-- Central Line -->
-<div class="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-primary/10 to-transparent transform -translate-x-1/2"></div>
-<!-- Milestone 01: Left -->
-<div class="relative grid grid-cols-2 gap-12 mb-24">
-<div class="text-right flex flex-col items-end">
-<div class="luminous-border bg-surface-container p-8 rounded-xl w-full hover:scale-[1.02] transition-transform cursor-pointer relative group">
-<div class="flex items-center justify-between mb-6">
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-secondary font-bold">Completed</span>
-<div class="text-4xl font-black font-headline opacity-10 text-on-surface group-hover:opacity-20 transition-opacity">01</div>
-</div>
-<h3 class="text-2xl font-bold mb-2">Core Foundations &amp; Gap Analysis</h3>
-<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Systematic audit of distributed systems knowledge and algorithmic complexity based on target role requirements.</p>
-<div class="space-y-4 mb-8">
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono'] text-on-surface/80">
-<span class="material-symbols-outlined text-secondary text-sm" data-weight="fill">check_circle</span>
-<span>Advanced Data Structures Review</span>
-</div>
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono'] text-on-surface/80">
-<span class="material-symbols-outlined text-secondary text-sm" data-weight="fill">check_circle</span>
-<span>Distributed Systems Whitepaper Analysis</span>
-</div>
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono'] text-on-surface/80">
-<span class="material-symbols-outlined text-secondary text-sm" data-weight="fill">check_circle</span>
-<span>Mock Technical Assessment Alpha</span>
-</div>
-</div>
-<div class="pt-6 border-t border-outline-variant/10 flex items-center justify-between">
-<div class="flex-1 mr-4">
-<div class="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
-<div class="h-full bg-secondary w-full"></div>
-</div>
-</div>
-<span class="font-['JetBrains_Mono'] text-[10px] text-secondary">100%</span>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-start relative">
-<div class="w-4 h-4 rounded-full bg-secondary border-4 border-background shadow-[0_0_15px_rgba(78,222,163,0.5)] absolute left-0 transform -translate-x-1/2 z-10"></div>
-<div class="pl-12">
-<span class="font-['JetBrains_Mono'] text-xs text-primary/40 uppercase tracking-[0.2em]">Week 01-02</span>
-<div class="mt-2 text-xs text-on-surface-variant max-w-[200px]">Strategic focus on hardening the architectural core.</div>
-</div>
-</div>
-</div>
-<!-- Milestone 02: Right -->
-<div class="relative grid grid-cols-2 gap-12 mb-24">
-<div class="col-start-2 text-left">
-<div class="luminous-border bg-surface-container p-8 rounded-xl w-full hover:scale-[1.02] transition-transform cursor-pointer relative group">
-<div class="flex items-center justify-between mb-6">
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-primary font-bold">In Progress</span>
-<div class="text-4xl font-black font-headline opacity-10 text-on-surface group-hover:opacity-20 transition-opacity">02</div>
-</div>
-<h3 class="text-2xl font-bold mb-2">Microservices Architecture</h3>
-<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Deep dive into event-driven design patterns, service discovery, and container orchestration at scale.</p>
-<div class="space-y-4 mb-8">
-<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high/50 border border-outline-variant/5">
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono']">
-<span class="material-symbols-outlined text-primary text-sm">radio_button_checked</span>
-<span>Kubernetes Manifest Mastery</span>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant text-sm cursor-grab active:cursor-grabbing">drag_indicator</span>
-</div>
-<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high/50 border border-outline-variant/5">
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono']">
-<span class="material-symbols-outlined text-outline text-sm">radio_button_unchecked</span>
-<span>Kafka Stream Processing Patterns</span>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant text-sm cursor-grab active:cursor-grabbing">drag_indicator</span>
-</div>
-<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high/50 border border-outline-variant/5">
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono']">
-<span class="material-symbols-outlined text-outline text-sm">radio_button_unchecked</span>
-<span>gRPC Implementation Strategies</span>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant text-sm cursor-grab active:cursor-grabbing">drag_indicator</span>
-</div>
-</div>
-<div class="pt-6 border-t border-outline-variant/10 flex items-center justify-between">
-<div class="flex-1 mr-4">
-<div class="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
-<div class="h-full bg-primary w-1/3"></div>
-</div>
-</div>
-<span class="font-['JetBrains_Mono'] text-[10px] text-primary">34%</span>
-</div>
-</div>
-</div>
-<div class="col-start-1 row-start-1 flex items-center justify-end relative">
-<div class="w-4 h-4 rounded-full bg-primary border-4 border-background shadow-[0_0_15px_rgba(192,193,255,0.5)] absolute right-0 transform translate-x-1/2 z-10"></div>
-<div class="pr-12 text-right">
-<span class="font-['JetBrains_Mono'] text-xs text-primary/40 uppercase tracking-[0.2em]">Week 03-05</span>
-<div class="mt-2 text-xs text-on-surface-variant max-w-[200px] ml-auto">Implementation phase for cloud-native ecosystems.</div>
-</div>
-</div>
-</div>
-<!-- Milestone 03: Left -->
-<div class="relative grid grid-cols-2 gap-12 mb-24">
-<div class="text-right flex flex-col items-end opacity-40 grayscale group hover:opacity-100 hover:grayscale-0 transition-all duration-500">
-<div class="luminous-border bg-surface-container p-8 rounded-xl w-full relative">
-<div class="flex items-center justify-between mb-6">
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-outline">Upcoming</span>
-<div class="text-4xl font-black font-headline opacity-10 text-on-surface group-hover:opacity-20 transition-opacity">03</div>
-</div>
-<h3 class="text-2xl font-bold mb-2">System Design Interviews</h3>
-<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Simulated high-pressure scenarios focusing on scalability, availability, and cost-efficiency trade-offs.</p>
-<div class="space-y-4 mb-8 text-left">
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono'] text-on-surface/40">
-<span class="material-symbols-outlined text-sm">lock</span>
-<span>High-Scale Feed Architectures</span>
-</div>
-<div class="flex items-center gap-3 text-xs font-['JetBrains_Mono'] text-on-surface/40">
-<span class="material-symbols-outlined text-sm">lock</span>
-<span>Database Partitioning &amp; Sharding</span>
-</div>
-</div>
-<div class="pt-6 border-t border-outline-variant/10 flex items-center justify-between">
-<div class="flex-1 mr-4">
-<div class="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
-<div class="h-full bg-outline-variant w-0"></div>
-</div>
-</div>
-<span class="font-['JetBrains_Mono'] text-[10px] text-outline">0%</span>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-start relative">
-<div class="w-4 h-4 rounded-full bg-surface-container-high border-2 border-outline-variant absolute left-0 transform -translate-x-1/2 z-10"></div>
-<div class="pl-12">
-<span class="font-['JetBrains_Mono'] text-xs text-primary/40 uppercase tracking-[0.2em]">Week 06-08</span>
-<div class="mt-2 text-xs text-on-surface-variant max-w-[200px]">Behavioral and technical synergy preparation.</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Career Insight Bento Section -->
-<div class="max-w-6xl mx-auto mt-32">
-<h4 class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.3em] text-primary/60 mb-8">Neural Analysis Insights</h4>
-<div class="grid grid-cols-3 gap-6">
-<div class="col-span-2 glass-panel p-8 rounded-2xl luminous-border">
-<div class="flex items-start justify-between mb-8">
-<div>
-<p class="font-['JetBrains_Mono'] text-xs text-primary uppercase mb-2">Roadmap Confidence</p>
-<h5 class="text-3xl font-bold font-headline">AI predicts 89% placement probability</h5>
-</div>
-<div class="w-16 h-16 rounded-full border-2 border-primary/20 flex items-center justify-center">
-<span class="material-symbols-outlined text-primary text-2xl">trending_up</span>
-</div>
-</div>
-<p class="text-on-surface-variant text-sm leading-relaxed max-w-xl">Your consistent performance in algorithmic complexity tests during Week 01 has increased the target salary projection by 14%. Current path is optimized for Tier-1 technology companies in the Seattle and Bay Area markets.</p>
-</div>
-<div class="bg-surface-container-high p-8 rounded-2xl luminous-border flex flex-col justify-between">
-<div>
-<p class="font-['JetBrains_Mono'] text-xs text-secondary uppercase mb-2">Next Sprint</p>
-<h5 class="text-xl font-bold font-headline">Service Reliability Engineering</h5>
-</div>
-<div class="space-y-4">
-<div class="flex items-center gap-2">
-<img alt="Resource" class="w-5 h-5" data-alt="minimalist tech logo icon with electric blue energy and clean geometric lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_Rps_uyMryCDhjJr_kU3ngSDQ8p5OuyabgJ6NhyJ8tqxjsGk7aVQIlG--w-GXswnJJO9XSJ8TwE6w0hexk0cbQMIbSJ6V63YgGA-wcd7UtYFDWsVdtkGKXRX0keSjkNPYaNjkPEpLq-XVemGwYJeiiB1RrN9efcrBy07hLfTmZJj82UauirucACPbA2bpmFh01D_1IUdiZEcPCUebaswxH8Uxi45gbEUama-GYKRcP8CLcWwRb3b6Rx37e0rUlVOp15xTlSp12Lk"/>
-<span class="text-xs font-['JetBrains_Mono'] text-on-surface/80">SRE Workbook v4.0</span>
-</div>
-<button class="w-full py-3 bg-surface-container rounded-lg text-[10px] uppercase font-['JetBrains_Mono'] tracking-widest text-on-surface hover:bg-surface-container-highest transition-colors">Preview Content</button>
-</div>
-</div>
-</div>
-</div>
-</main>
-<!-- Floating Action Element -->
-<div class="fixed bottom-8 right-8 z-50">
-<button class="w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-2xl shadow-primary/40 hover:scale-110 active:scale-95 transition-all group">
-<span class="material-symbols-outlined group-hover:rotate-90 transition-transform">add</span>
-</button>
-</div>
-</body></html>
+<body>
+    <nav class="sidebar">
+        <div class="brand">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4edea3" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
+            </svg>
+            <div><h2>NEXORA</h2><small>Neural Intelligence</small></div>
+        </div>
+        <a href="/student" class="nav-item">🏠 Home</a>
+        <a href="/coach" class="nav-item">🤖 My Coach</a>
+        <a href="/interview" class="nav-item">🎤 Mock Interview</a>
+        <a href="/roadmap" class="nav-item active">🗺️ My Roadmap</a>
+        <div class="nav-spacer"></div>
+        <a href="#" class="nav-item logout-btn" onclick="logout()">🚪 Logout</a>
+    </nav>
+
+    <div class="main">
+        <div class="page-header">
+            <div class="label">Task Pipeline</div>
+            <h1>My <span>Roadmap</span></h1>
+            <p>Tasks assigned by your AI agents — complete them to improve your placement readiness.</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Tasks</div>
+                <div class="stat-value purple" id="total-count">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completed</div>
+                <div class="stat-value green" id="completed-count">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">In Progress</div>
+                <div class="stat-value orange" id="progress-count">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value" id="pending-count">-</div>
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <button class="filter-btn active" onclick="filterTasks(null, this)">All</button>
+            <button class="filter-btn" onclick="filterTasks('pending', this)">Pending</button>
+            <button class="filter-btn" onclick="filterTasks('in_progress', this)">In Progress</button>
+            <button class="filter-btn" onclick="filterTasks('completed', this)">Completed</button>
+        </div>
+
+        <div id="tasks-container">
+            <div class="loading"><div class="spinner"></div><p>Loading your tasks...</p></div>
+        </div>
+    </div>
+
+    <script>
+        const API = '';
+        const token = localStorage.getItem('nexora_token');
+        if (!token) window.location.href = '/login';
+
+        let allTasks = [];
+
+        async function loadTasks() {
+            try {
+                const r = await fetch(`${API}/api/tasks/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (r.status === 401) { window.location.href = '/login'; return; }
+                const data = await r.json();
+                allTasks = data.tasks || [];
+                updateStats();
+                renderTasks(allTasks);
+            } catch (e) {
+                document.getElementById('tasks-container').innerHTML =
+                    `<div class="empty-state"><h3>Failed to load tasks</h3><p>${e.message}</p></div>`;
+            }
+        }
+
+        function updateStats() {
+            const completed = allTasks.filter(t => t.status === 'completed').length;
+            const inProgress = allTasks.filter(t => t.status === 'in_progress').length;
+            const pending = allTasks.filter(t => t.status === 'pending').length;
+            document.getElementById('total-count').textContent = allTasks.length;
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('progress-count').textContent = inProgress;
+            document.getElementById('pending-count').textContent = pending;
+        }
+
+        function renderTasks(tasks) {
+            if (tasks.length === 0) {
+                document.getElementById('tasks-container').innerHTML =
+                    `<div class="empty-state">
+                        <h3>No tasks yet</h3>
+                        <p>Chat with your AI Coach to get personalized tasks and a study roadmap.</p>
+                        <a href="/coach" style="display:inline-block;margin-top:16px;padding:12px 24px;background:var(--primary-container);color:white;border-radius:12px;text-decoration:none;font-size:0.85rem;">Talk to Coach →</a>
+                    </div>`;
+                return;
+            }
+
+            document.getElementById('tasks-container').innerHTML = tasks.map(t => `
+                <div class="task-card" data-id="${t.id}">
+                    <div class="task-checkbox ${t.status}" onclick="toggleTask('${t.id}', '${t.status}')">
+                        ${t.status === 'completed' ? '✓' : t.status === 'in_progress' ? '◉' : ''}
+                    </div>
+                    <div class="task-info">
+                        <div class="task-title ${t.status === 'completed' ? 'completed' : ''}">${t.title || t.description || 'Task'}</div>
+                        <div class="task-meta">
+                            ${t.due_date ? 'Due: ' + new Date(t.due_date).toLocaleDateString() : 'No due date'}
+                            ${t.category ? ' · ' + t.category : ''}
+                            ${t.created_at ? ' · Created: ' + new Date(t.created_at).toLocaleDateString() : ''}
+                        </div>
+                    </div>
+                    <span class="task-status-badge ${t.status}">${t.status?.replace('_', ' ') || 'pending'}</span>
+                </div>
+            `).join('');
+        }
+
+        function filterTasks(status, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filtered = status ? allTasks.filter(t => t.status === status) : allTasks;
+            renderTasks(filtered);
+        }
+
+        async function toggleTask(taskId, currentStatus) {
+            const nextStatus = currentStatus === 'pending' ? 'in_progress' :
+                              currentStatus === 'in_progress' ? 'completed' : 'pending';
+            try {
+                await fetch(`${API}/api/tasks/${taskId}`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: nextStatus })
+                });
+                loadTasks();  // Reload
+            } catch (e) { console.error('Toggle failed:', e); }
+        }
+
+        function logout() {
+            localStorage.removeItem('nexora_token');
+            localStorage.removeItem('nexora_user');
+            window.location.href = '/login';
+        }
+
+        loadTasks();
+    </script>
+</body>
+</html>

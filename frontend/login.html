@@ -1,218 +1,433 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXORA | Login</title>
+    <meta name="description" content="NEXORA — Multi-agent AI placement readiness platform. Login with your email.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>NEXORA | Neural Intelligence Placement Mentor</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Grotesk:wght@300;500;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "secondary-container": "#00a572",
-                    "on-tertiary-fixed": "#301400",
-                    "tertiary-fixed-dim": "#ffb783",
-                    "background": "#0e1322",
-                    "surface-container": "#1a1f2f",
-                    "error-container": "#93000a",
-                    "primary": "#c0c1ff",
-                    "surface-container-low": "#161b2b",
-                    "surface-dim": "#0e1322",
-                    "on-surface": "#dee1f7",
-                    "on-primary-fixed": "#07006c",
-                    "secondary-fixed": "#6ffbbe",
-                    "tertiary-container": "#d97721",
-                    "outline-variant": "#464554",
-                    "on-background": "#dee1f7",
-                    "tertiary-fixed": "#ffdcc5",
-                    "on-secondary-fixed-variant": "#005236",
-                    "secondary-fixed-dim": "#4edea3",
-                    "on-secondary-fixed": "#002113",
-                    "error": "#ffb4ab",
-                    "on-tertiary-container": "#452000",
-                    "on-tertiary-fixed-variant": "#703700",
-                    "inverse-primary": "#494bd6",
-                    "surface-container-highest": "#2f3445",
-                    "surface-tint": "#c0c1ff",
-                    "primary-container": "#8083ff",
-                    "inverse-on-surface": "#2b3040",
-                    "on-secondary": "#003824",
-                    "primary-fixed": "#e1e0ff",
-                    "surface-container-high": "#25293a",
-                    "secondary": "#4edea3",
-                    "on-primary-container": "#0d0096",
-                    "primary-fixed-dim": "#c0c1ff",
-                    "inverse-surface": "#dee1f7",
-                    "on-tertiary": "#4f2500",
-                    "on-primary": "#1000a9",
-                    "on-secondary-container": "#00311f",
-                    "surface-bright": "#343949",
-                    "on-primary-fixed-variant": "#2f2ebe",
-                    "tertiary": "#ffb783",
-                    "on-error": "#690005",
-                    "surface-variant": "#2f3445",
-                    "outline": "#908fa0",
-                    "on-surface-variant": "#c7c4d7",
-                    "on-error-container": "#ffdad6",
-                    "surface-container-lowest": "#090e1c",
-                    "surface": "#0e1322"
-            },
-            "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
-            },
-            "fontFamily": {
-                    "headline": ["Inter"],
-                    "body": ["Inter"],
-                    "label": ["Space Grotesk"],
-                    "mono": ["JetBrains Mono"]
-            }
-          },
-        },
-      }
-    </script>
-<style>
+        :root {
+            --bg: #0e1322;
+            --surface: #1a1f2f;
+            --surface-high: #25293a;
+            --surface-highest: #2f3445;
+            --primary: #c0c1ff;
+            --primary-container: #6366F1;
+            --secondary: #4edea3;
+            --on-surface: #dee1f7;
+            --on-surface-variant: #908fa0;
+            --outline: #464554;
+            --error: #ffb4ab;
+        }
+
         body {
-            background-color: #0e1322;
-            background-image: radial-gradient(rgba(192, 193, 255, 0.05) 1px, transparent 0);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--on-surface);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(rgba(99,102,241,0.05) 1px, transparent 1px);
             background-size: 24px 24px;
         }
-        .neural-glow {
-            text-shadow: 0 0 20px rgba(192, 193, 255, 0.4);
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            padding: 16px 32px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--secondary);
         }
-        .waveform-bar {
-            width: 3px;
-            background-color: #c0c1ff;
-            border-radius: 99px;
-            display: inline-block;
+
+        .top-bar .logo { display: flex; align-items: center; gap: 8px; }
+        .top-bar .status { color: var(--on-surface-variant); }
+
+        .login-container {
+            width: 100%; max-width: 480px;
+            padding: 48px;
+            text-align: center;
         }
-        input:focus {
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .neural-bars { display: flex; gap: 3px; justify-content: center; margin-bottom: 24px; }
+        .neural-bars span {
+            width: 3px; border-radius: 2px;
+            background: var(--primary-container);
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        .neural-bars span:nth-child(1) { height: 12px; animation-delay: 0s; }
+        .neural-bars span:nth-child(2) { height: 8px; animation-delay: 0.15s; }
+        .neural-bars span:nth-child(3) { height: 16px; animation-delay: 0.3s; }
+        .neural-bars span:nth-child(4) { height: 6px; animation-delay: 0.45s; }
+        .neural-bars span:nth-child(5) { height: 14px; animation-delay: 0.6s; }
+        @keyframes pulse {
+            0%, 100% { transform: scaleY(1); opacity: 0.6; }
+            50% { transform: scaleY(1.8); opacity: 1; }
+        }
+
+        .tagline {
+            font-size: 1.1rem; line-height: 1.6;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+        }
+        .tagline .highlight { color: var(--secondary); }
+
+        .system-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem; letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+            margin-bottom: 40px;
+        }
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: left;
+        }
+
+        .field-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--outline);
+            color: var(--on-surface);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            padding: 12px 0;
             outline: none;
-            box-shadow: 0 4px 12px -2px rgba(192, 193, 255, 0.2);
+            transition: border-color 0.3s;
         }
-        .otp-box:focus {
-            border-color: #c0c1ff;
-            background-color: rgba(192, 193, 255, 0.05);
+        .input-field:focus { border-bottom-color: var(--primary-container); box-shadow: 0 2px 8px rgba(99,102,241,0.15); }
+        .input-field::placeholder { color: var(--on-surface-variant); font-family: 'Inter', sans-serif; }
+
+        .otp-section { margin-top: 24px; display: none; }
+        .otp-section.active { display: block; }
+
+        .otp-row {
+            display: flex; gap: 8px; justify-content: center; margin-top: 8px;
+        }
+        .otp-input {
+            width: 48px; height: 56px;
+            background: var(--surface-high);
+            border: 1px solid var(--outline);
+            border-radius: 8px;
+            color: var(--on-surface);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .otp-input:focus { border-color: var(--primary-container); box-shadow: 0 0 12px rgba(99,102,241,0.2); }
+
+        .resend-link {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            float: right;
+            margin-bottom: 4px;
+        }
+        .resend-link:hover { color: var(--primary); }
+
+        .btn-primary {
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px;
+            background: var(--primary-container);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.3); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .message {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            text-align: center;
+            min-height: 20px;
+        }
+        .message.success { color: var(--secondary); }
+        .message.error { color: var(--error); }
+
+        .status-pill {
+            position: fixed; bottom: 24px; right: 24px;
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface-high);
+            border: 1px solid var(--outline);
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--on-surface-variant);
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--secondary);
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .agents-info {
+            margin-top: 32px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .agent-chip {
+            background: var(--surface);
+            border: 1px solid rgba(99,102,241,0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+        }
+        .agent-chip .name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+        .agent-chip .desc {
+            color: var(--on-surface-variant);
+            margin-top: 4px;
         }
     </style>
 </head>
-<body class="font-body text-on-surface selection:bg-primary selection:text-on-primary min-h-screen flex flex-col overflow-x-hidden">
-<!-- Top Navigation (Shell Suppressed for Focused Login) -->
-<header class="fixed top-0 left-0 w-full h-20 flex items-center justify-between px-8 z-50">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
-<div class="font-mono text-xs uppercase tracking-[0.2em] text-primary/60">System Ready</div>
-</div>
-<div class="flex items-center gap-6">
-<span class="material-symbols-outlined text-on-surface-variant/40 text-sm" data-icon="graphic_eq">graphic_eq</span>
-<span class="material-symbols-outlined text-on-surface-variant/40 text-sm" data-icon="timer">timer</span>
-</div>
-</header>
-<main class="flex-grow flex flex-col items-center justify-center px-6 py-20 relative">
-<!-- Background Ambient Aura -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
-<!-- Central Branding Container -->
-<div class="w-full max-w-2xl text-center space-y-12 z-10">
-<!-- Animated Wordmark Area -->
-<div class="space-y-4">
-<h1 class="text-6xl md:text-8xl font-black tracking-tighter text-primary neural-glow font-headline">
-                    NEXORA
-                </h1>
-<div class="flex justify-center items-center gap-1.5 h-6">
-<div class="waveform-bar h-2"></div>
-<div class="waveform-bar h-5"></div>
-<div class="waveform-bar h-3"></div>
-<div class="waveform-bar h-6"></div>
-<div class="waveform-bar h-4"></div>
-</div>
-</div>
-<!-- Tagline -->
-<div class="space-y-2 max-w-md mx-auto">
-<p class="text-xl md:text-2xl text-on-surface font-light tracking-tight">
-                    Your AI placement mentor. <span class="text-primary font-medium">Knows you.</span> Guides you. Watches your back.
-                </p>
-<div class="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 pt-4">
-                    Cognitive Neural Interface v2.04
+<body>
+    <div class="top-bar">
+        <div class="logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4edea3" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
+            </svg>
+            <span>NEXORA</span>
+        </div>
+        <div class="status" id="api-status">Connecting...</div>
+    </div>
+
+    <div class="login-container">
+        <h1>NEXORA</h1>
+        <div class="neural-bars">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="tagline">Your AI placement mentor. <span class="highlight">Knows you.</span><br>Guides you. Watches your back.</p>
+        <p class="system-label">Multi-Agent Cognitive Platform v1.0</p>
+
+        <div class="form-card">
+            <div id="email-section">
+                <p class="field-label">Identity Access</p>
+                <input type="email" id="email-input" class="input-field" placeholder="Enter your email address">
+            </div>
+
+            <div id="otp-section" class="otp-section">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <p class="field-label">Verification Code</p>
+                    <span class="resend-link" onclick="sendOTP()">Resend Code</span>
                 </div>
-</div>
-<!-- Login Flow Container -->
-<div class="w-full max-w-md mx-auto space-y-8 bg-surface-container-low/50 backdrop-blur-xl p-10 rounded-xl border border-primary/10">
-<!-- Email Stage -->
-<div class="space-y-6">
-<div class="text-left space-y-1">
-<label class="font-label text-[11px] uppercase tracking-widest text-primary">Identity Access</label>
-<div class="relative group">
-<input class="w-full bg-transparent border-b border-outline-variant py-4 font-mono text-lg transition-all focus:border-primary placeholder:text-on-surface-variant/30" placeholder="Enter your university email" type="email"/>
-<div class="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-opacity">
-<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
-</div>
-</div>
-</div>
-</div>
-<!-- OTP Stage (Shown contextually) -->
-<div class="space-y-6 pt-4">
-<div class="text-left space-y-4">
-<div class="flex justify-between items-end">
-<label class="font-label text-[11px] uppercase tracking-widest text-on-surface-variant">Verification Code</label>
-<button class="font-mono text-[10px] text-primary/60 hover:text-primary transition-colors">Resend Code</button>
-</div>
-<div class="flex justify-between gap-2">
-<input class="otp-box w-12 h-14 bg-surface-container-highest/30 border border-outline-variant rounded-lg text-center font-mono text-2xl text-primary focus:outline-none transition-all" maxlength="1" type="text"/>
-<input class="otp-box w-12 h-14 bg-surface-container-highest/30 border border-outline-variant rounded-lg text-center font-mono text-2xl text-primary focus:outline-none transition-all" maxlength="1" type="text"/>
-<input class="otp-box w-12 h-14 bg-surface-container-highest/30 border border-outline-variant rounded-lg text-center font-mono text-2xl text-primary focus:outline-none transition-all" maxlength="1" type="text"/>
-<input class="otp-box w-12 h-14 bg-surface-container-highest/30 border border-outline-variant rounded-lg text-center font-mono text-2xl text-primary focus:outline-none transition-all" maxlength="1" type="text"/>
-<input class="otp-box w-12 h-14 bg-surface-container-highest/30 border border-outline-variant rounded-lg text-center font-mono text-2xl text-primary focus:outline-none transition-all" maxlength="1" type="text"/>
-<input class="otp-box w-12 h-14 bg-surface-container-highest/30 border border-outline-variant rounded-lg text-center font-mono text-2xl text-primary focus:outline-none transition-all" maxlength="1" type="text"/>
-</div>
-</div>
-</div>
-<button class="w-full py-4 bg-primary text-on-primary font-bold rounded-lg transition-all active:scale-[0.97] hover:shadow-[0_0_20px_rgba(192,193,255,0.3)]">
-                    Initialize Session
-                </button>
-</div>
-</div>
-</main>
-<!-- Footer Stats (Asymmetric Layout) -->
-<footer class="w-full px-12 py-8 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-primary/5">
-<div class="flex gap-12">
-<div class="space-y-1">
-<div class="font-label text-[10px] text-on-surface-variant/40 tracking-widest uppercase">Active Agents</div>
-<div class="font-mono text-secondary text-sm">1,248</div>
-</div>
-<div class="space-y-1">
-<div class="font-label text-[10px] text-on-surface-variant/40 tracking-widest uppercase">Success Latency</div>
-<div class="font-mono text-on-surface text-sm">124ms</div>
-</div>
-<div class="space-y-1">
-<div class="font-label text-[10px] text-on-surface-variant/40 tracking-widest uppercase">Data Nodes</div>
-<div class="font-mono text-on-surface text-sm">GLOBAL_B3</div>
-</div>
-</div>
-<div class="flex items-center gap-8">
-<div class="flex items-center gap-3">
-<img class="w-10 h-10 rounded-full border border-primary/20 object-cover" data-alt="close-up portrait of a diverse tech-focused young professional looking confident, soft studio lighting with cool tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0KqUpLVNa03hn4KJwWXQVyZd_FrS3d0_TZ2o8r9NInmDkFOE-S-NwzJ6rGdZuoQTfoox-WSMO88K2IE6_PLE3UK4T4i5Srf0QyVew-7hNZJY1Y0D5l0uPnaYfOFqhY_Xgv4k6rSa20EivDyxqZ8Urh1vP2GNF7KrETGlDpk2RDnbjF7vO9lgv6dakOKl23jNMeqXL3_lPW4ZCZKS8IyboYno1l_GN3u-13eo43XVB1NxartzgWVk63TJTjroUpGYZ1t09Me-T1kU"/>
-<div class="text-left">
-<div class="font-mono text-xs text-on-surface">Verified Mentor</div>
-<div class="font-label text-[10px] text-on-surface-variant/50">Alex Chen, Senior AI Architect</div>
-</div>
-</div>
-<div class="h-8 w-px bg-outline-variant/30"></div>
-<div class="flex gap-4">
-<span class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary transition-colors cursor-pointer" data-icon="terminal">terminal</span>
-<span class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary transition-colors cursor-pointer" data-icon="policy">policy</span>
-</div>
-</div>
-</footer>
-<!-- Floating AI Status Badge -->
-<div class="fixed bottom-10 right-10 flex items-center gap-3 bg-surface-container-high/80 backdrop-blur-md px-4 py-2 rounded-full border border-primary/10 shadow-lg">
-<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-<span class="font-mono text-[10px] tracking-tight uppercase text-secondary">Neural Link Stable</span>
-</div>
-</body></html>
+                <div class="otp-row">
+                    <input type="text" maxlength="1" class="otp-input" data-idx="0">
+                    <input type="text" maxlength="1" class="otp-input" data-idx="1">
+                    <input type="text" maxlength="1" class="otp-input" data-idx="2">
+                    <input type="text" maxlength="1" class="otp-input" data-idx="3">
+                    <input type="text" maxlength="1" class="otp-input" data-idx="4">
+                    <input type="text" maxlength="1" class="otp-input" data-idx="5">
+                </div>
+            </div>
+
+            <button id="submit-btn" class="btn-primary" onclick="handleSubmit()">Send Verification Code</button>
+            <p id="message" class="message"></p>
+        </div>
+
+        <div class="agents-info">
+            <div class="agent-chip">
+                <div class="name">📄 ResumeAgent</div>
+                <div class="desc">PDF analysis & skill extraction</div>
+            </div>
+            <div class="agent-chip">
+                <div class="name">🤖 CoachAgent</div>
+                <div class="desc">AI career mentor with memory</div>
+            </div>
+            <div class="agent-chip">
+                <div class="name">🎤 InterviewAgent</div>
+                <div class="desc">Mock interviews & scoring</div>
+            </div>
+            <div class="agent-chip">
+                <div class="name">🚨 AlertAgent</div>
+                <div class="desc">Risk evaluation & alerts</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-pill">
+        <span class="status-dot"></span>
+        <span id="connection-status">Checking connection...</span>
+    </div>
+
+    <script>
+        const API = '';  // Same origin
+        let currentEmail = '';
+        let otpSent = false;
+
+        // Check API health on load
+        async function checkHealth() {
+            try {
+                const r = await fetch(`${API}/health`);
+                const d = await r.json();
+                document.getElementById('api-status').textContent =
+                    `${d.services.supabase === 'connected' ? '✓' : '✗'} Supabase · ${d.services.pinecone === 'connected' ? '✓' : '✗'} Pinecone`;
+                document.getElementById('connection-status').textContent =
+                    d.status === 'healthy' ? 'All Systems Online' : 'Degraded';
+            } catch {
+                document.getElementById('api-status').textContent = 'API Offline';
+                document.getElementById('connection-status').textContent = 'Connection Failed';
+            }
+        }
+        checkHealth();
+
+        // Check if already logged in
+        const token = localStorage.getItem('nexora_token');
+        if (token) {
+            fetch(`${API}/api/dashboard/student`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(r => {
+                if (r.ok) window.location.href = '/student';
+            });
+        }
+
+        // OTP input auto-advance
+        document.querySelectorAll('.otp-input').forEach((inp, i, all) => {
+            inp.addEventListener('input', () => {
+                if (inp.value && i < all.length - 1) all[i + 1].focus();
+            });
+            inp.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !inp.value && i > 0) all[i - 1].focus();
+            });
+        });
+
+        function showMessage(text, type) {
+            const m = document.getElementById('message');
+            m.textContent = text;
+            m.className = `message ${type}`;
+        }
+
+        async function sendOTP() {
+            const email = document.getElementById('email-input').value.trim();
+            if (!email) return showMessage('Please enter your email', 'error');
+
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            try {
+                const r = await fetch(`${API}/auth/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const d = await r.json();
+                if (r.ok) {
+                    currentEmail = email;
+                    otpSent = true;
+                    document.getElementById('otp-section').classList.add('active');
+                    btn.textContent = 'Verify & Login';
+                    showMessage(`OTP sent to ${email}. Check your inbox.`, 'success');
+                    document.querySelector('.otp-input').focus();
+                } else {
+                    showMessage(d.detail || 'Failed to send OTP', 'error');
+                    btn.textContent = 'Send Verification Code';
+                }
+            } catch (e) {
+                showMessage('Network error. Is the server running?', 'error');
+                btn.textContent = 'Send Verification Code';
+            }
+            btn.disabled = false;
+        }
+
+        async function verifyOTP() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const token = Array.from(otpInputs).map(i => i.value).join('');
+            if (token.length !== 6) return showMessage('Enter all 6 digits', 'error');
+
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'Verifying...';
+
+            try {
+                const r = await fetch(`${API}/auth/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentEmail, token })
+                });
+                const d = await r.json();
+                if (r.ok && d.success) {
+                    localStorage.setItem('nexora_token', d.access_token);
+                    localStorage.setItem('nexora_user', JSON.stringify(d.user));
+                    showMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(() => window.location.href = '/student', 800);
+                } else {
+                    showMessage(d.detail || 'Invalid or expired OTP', 'error');
+                    btn.textContent = 'Verify & Login';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                showMessage('Verification failed. Try again.', 'error');
+                btn.textContent = 'Verify & Login';
+                btn.disabled = false;
+            }
+        }
+
+        function handleSubmit() {
+            if (otpSent) verifyOTP();
+            else sendOTP();
+        }
+
+        // Enter key support
+        document.getElementById('email-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleSubmit();
+        });
+        document.querySelectorAll('.otp-input').forEach(inp => {
+            inp.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') handleSubmit();
+            });
+        });
+    </script>
+</body>
+</html>

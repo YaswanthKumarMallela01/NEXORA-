@@ -1,41 +1,38 @@
-# ── Environment ─────────────────────────────────────────
+# Environment
 .env
 .env.*
 !.env.example
 
-# ── Python ──────────────────────────────────────────────
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-*.egg
-dist/
-build/
-*.whl
-
-# ── Virtual Environment ────────────────────────────────
+*.so
 .venv/
 venv/
-ENV/
+env/
+*.egg-info/
+dist/
+build/
 
-# ── IDE ─────────────────────────────────────────────────
-.idea/
+# IDE
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
 
-# ── OS ──────────────────────────────────────────────────
+# OS
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ── Vercel ──────────────────────────────────────────────
-.vercel/
+# RAG data
+placement_resources/
+*.pdf
 
-# ── Misc ────────────────────────────────────────────────
+# Logs
 *.log
-placement_resources/*.pdf
+
+# Gemini
+.gemini/
