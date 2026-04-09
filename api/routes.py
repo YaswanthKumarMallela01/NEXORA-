@@ -3,7 +3,7 @@ NEXORA — API Routes
 All endpoint definitions, grouped by feature domain.
 
 Routers:
-  /auth/*           — OTP authentication
+  /auth/*           — Email + Password authentication
   /api/resume/*     — Resume analysis
   /api/coach/*      — CoachAgent chat
   /api/interview/*  — Mock interview sessions
@@ -18,11 +18,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, EmailStr, Field
 
 from auth.supabase_auth import (
-    send_otp,
-    verify_otp,
+    signup_user,
+    login_user,
     get_current_user,
     require_tpc_role,
+    get_auth_email_redirect_url,
 )
+from config import get_settings
 from agents.resume_agent import analyze_resume
 from agents.coach_agent import chat_with_coach, get_conversation_history
 from agents.interview_agent import start_interview, submit_answer, get_session_summary
@@ -34,6 +36,7 @@ from db.supabase_client import (
     get_tasks,
     update_task,
     acknowledge_alert,
+    get_supabase,
 )
 
 logger = logging.getLogger("nexora.api.routes")
@@ -44,13 +47,15 @@ logger = logging.getLogger("nexora.api.routes")
 # ════════════════════════════════════════════════════════════
 
 # ── Auth ──
-class SendOTPRequest(BaseModel):
+class SignupRequest(BaseModel):
     email: EmailStr
+    password: str = Field(..., min_length=6, description="Min 6 characters")
+    name: str = Field(..., min_length=1, max_length=100)
 
 
-class VerifyOTPRequest(BaseModel):
+class LoginRequest(BaseModel):
     email: EmailStr
-    token: str
+    password: str
 
 
 # ── Resume ──
@@ -95,16 +100,16 @@ class TaskUpdateRequest(BaseModel):
 auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@auth_router.post("/send-otp")
-async def route_send_otp(req: SendOTPRequest):
-    """Send OTP to user's email via Supabase Magic Link."""
-    return await send_otp(req.email)
+@auth_router.post("/signup")
+async def route_signup(req: SignupRequest):
+    """Create a new account with email, password, and name."""
+    return await signup_user(req.email, req.password, req.name)
 
 
-@auth_router.post("/verify-otp")
-async def route_verify_otp(req: VerifyOTPRequest):
-    """Verify OTP and return JWT session."""
-    return await verify_otp(req.email, req.token)
+@auth_router.post("/login")
+async def route_login(req: LoginRequest):
+    """Log in with email and password. Returns JWT session."""
+    return await login_user(req.email, req.password)
 
 
 # ════════════════════════════════════════════════════════════
@@ -308,6 +313,66 @@ async def route_acknowledge_alert(
 # ════════════════════════════════════════════════════════════
 
 tasks_router = APIRouter(prefix="/api/tasks", tags=["Tasks"])
+
+
+# ════════════════════════════════════════════════════════════
+#  SYSTEM / DIAGNOSTICS (no auth — for local verification)
+# ════════════════════════════════════════════════════════════
+
+system_router = APIRouter(prefix="/api/system", tags=["System"])
+
+
+@system_router.get("/status")
+async def route_system_status():
+    """
+    Non-secret connectivity snapshot: Supabase, Pinecone, and which API keys are set.
+    Use this to verify backend wiring from the browser or curl.
+    """
+    settings = get_settings()
+    redirect_url = get_auth_email_redirect_url()
+
+    supabase_state = "disconnected"
+    try:
+        get_supabase()
+        supabase_state = "connected"
+    except Exception:
+        pass
+
+    pinecone_state = "disconnected"
+    try:
+        from pinecone import Pinecone
+
+        pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+        indexes = [idx.name for idx in pc.list_indexes()]
+        pinecone_state = (
+            "connected" if settings.PINECONE_INDEX_NAME in indexes else "index_missing"
+        )
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "environment": settings.ENVIRONMENT,
+        "frontend_base": settings.NEXT_PUBLIC_APP_URL.rstrip("/"),
+        "auth": {
+            "email_confirmation_redirect": redirect_url,
+            "setup_note": (
+                "In Supabase: Authentication → URL Configuration → "
+                "set Site URL to your app origin and add the redirect URL above to Redirect URLs."
+            ),
+        },
+        "services": {
+            "supabase": supabase_state,
+            "pinecone": pinecone_state,
+        },
+        "api_keys_configured": {
+            "groq": bool(settings.GROQ_API_KEY),
+            "google_genai": bool(settings.GOOGLE_API_KEY),
+            "huggingface": bool(settings.HUGGINGFACE_API_KEY),
+            "together": bool(settings.TOGETHER_API_KEY),
+            "resend": bool(settings.RESEND_API_KEY),
+        },
+    }
 
 
 @tasks_router.get("/")

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXORA | Confirming…</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0e1322; --surface: #1a1f2f; --primary: #6366F1; --secondary: #4edea3;
+            --on-surface: #dee1f7; --on-surface-variant: #908fa0; --error: #ffb4ab; --outline: #464554;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--on-surface);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .card {
+            background: var(--surface); border: 1px solid var(--outline); border-radius: 16px;
+            padding: 32px; max-width: 440px; text-align: center;
+        }
+        h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; margin-bottom: 12px; color: var(--secondary); }
+        p { font-size: 0.95rem; line-height: 1.5; color: var(--on-surface-variant); }
+        .err { color: var(--error); margin-top: 12px; font-size: 0.9rem; }
+        a { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1 id="title">Finishing sign-in…</h1>
+        <p id="detail">Saving your session and redirecting to the dashboard.</p>
+        <p id="error" class="err" style="display:none;"></p>
+        <p style="margin-top:16px;font-size:0.8rem;"><a href="/login">Back to login</a></p>
+    </div>
+    <script>
+        (function () {
+            var hash = window.location.hash ? window.location.hash.substring(1) : '';
+            var q = window.location.search ? window.location.search.substring(1) : '';
+            var params = new URLSearchParams(hash || q);
+
+            var access = params.get('access_token');
+            var refresh = params.get('refresh_token');
+            var err = params.get('error') || params.get('error_code');
+            var desc = params.get('error_description') || '';
+
+            function fail(msg) {
+                document.getElementById('title').textContent = 'Could not confirm';
+                document.getElementById('detail').style.display = 'none';
+                var el = document.getElementById('error');
+                el.style.display = 'block';
+                el.textContent = msg;
+            }
+
+            if (err) {
+                fail(desc || err || 'Confirmation failed. Check Supabase redirect URLs match this app.');
+                return;
+            }
+
+            if (access) {
+                localStorage.setItem('nexora_token', access);
+                if (refresh) localStorage.setItem('nexora_refresh_token', refresh);
+                window.location.replace('/student');
+                return;
+            }
+
+            // PKCE: ?code=... — needs server exchange; show helpful message
+            if (params.get('code')) {
+                fail('This link used a ?code= flow. Ensure Supabase Site URL and Redirect URLs include ' +
+                    window.location.origin + '/auth/callback and try the confirmation email again.');
+                return;
+            }
+
+            fail('No session in this URL. Open the confirmation link from your email, or log in manually.');
+        })();
+    </script>
+</body>
+</html>

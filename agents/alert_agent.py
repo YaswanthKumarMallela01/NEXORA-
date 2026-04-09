@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 
 import resend
 
-from chains.orchestrator import get_agent_llm
+from chains.orchestrator import get_groq_llm, get_together_llm
 from db.supabase_client import (
     get_user,
     get_tasks,
@@ -143,7 +143,7 @@ def send_student_nudge(user: dict, risk: dict) -> bool:
     settings = get_settings()
 
     # Generate personalized message
-    llm = get_agent_llm("alert", temperature=0.7, max_tokens=1024)
+    llm = get_groq_llm(temperature=0.7, max_tokens=1024)
     prompt = f"""Write a short, encouraging email nudge for a placement student.
 
 Student name: {user.get('name', 'Student')}

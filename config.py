@@ -37,12 +37,17 @@ class Settings(BaseSettings):
 
     # ── App Config ──────────────────────────────────────
     NEXT_PUBLIC_APP_URL: str = Field(default="https://nexora.vercel.app")
+    # Where Supabase redirects after email confirmation (must be listed in Supabase Dashboard → Auth → URL Configuration → Redirect URLs)
+    AUTH_EMAIL_REDIRECT_URL: str = Field(
+        default="",
+        description="Full URL to /auth/callback; if empty, derived from NEXT_PUBLIC_APP_URL",
+    )
     JWT_SECRET: str = Field(..., description="JWT signing secret")
     ENVIRONMENT: str = Field(default="development")
 
     # ── Model Defaults ──────────────────────────────────
-    GROQ_MODEL: str = Field(default="llama-3.1-70b-versatile")
-    GEMINI_MODEL: str = Field(default="gemini-1.5-flash")
+    GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile")
+    GEMINI_MODEL: str = Field(default="gemini-3.1-flash-lite-preview")
     TOGETHER_MODEL: str = Field(default="mistralai/Mixtral-8x7B-Instruct-v0.1")
     EMBEDDING_MODEL: str = Field(default="all-MiniLM-L6-v2")
 

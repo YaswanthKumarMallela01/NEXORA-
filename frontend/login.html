@@ -4,239 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXORA | Login</title>
-    <meta name="description" content="NEXORA — Multi-agent AI placement readiness platform. Login with your email.">
+    <meta name="description" content="NEXORA — Multi-agent AI placement readiness platform. Sign up or log in.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         :root {
-            --bg: #0e1322;
-            --surface: #1a1f2f;
-            --surface-high: #25293a;
-            --surface-highest: #2f3445;
-            --primary: #c0c1ff;
-            --primary-container: #6366F1;
-            --secondary: #4edea3;
-            --on-surface: #dee1f7;
-            --on-surface-variant: #908fa0;
-            --outline: #464554;
+            --bg: #0e1322; --surface: #1a1f2f; --surface-high: #25293a; --surface-highest: #2f3445;
+            --primary: #c0c1ff; --primary-container: #6366F1; --secondary: #4edea3;
+            --on-surface: #dee1f7; --on-surface-variant: #908fa0; --outline: #464554;
             --error: #ffb4ab;
         }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--on-surface);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--on-surface);
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
             background-image: radial-gradient(rgba(99,102,241,0.05) 1px, transparent 1px);
             background-size: 24px 24px;
         }
-
         .top-bar {
-            position: fixed; top: 0; left: 0; right: 0;
-            padding: 16px 32px;
+            position: fixed; top: 0; left: 0; right: 0; padding: 16px 32px;
             display: flex; justify-content: space-between; align-items: center;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--secondary);
+            font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
+            letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary);
         }
-
         .top-bar .logo { display: flex; align-items: center; gap: 8px; }
         .top-bar .status { color: var(--on-surface-variant); }
 
-        .login-container {
-            width: 100%; max-width: 480px;
-            padding: 48px;
-            text-align: center;
-        }
+        .login-container { width: 100%; max-width: 480px; padding: 48px; text-align: center; }
 
-        h1 {
-            font-size: 4rem;
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
+        h1 { font-size: 3.5rem; font-weight: 900; letter-spacing: -0.03em; color: var(--primary); margin-bottom: 8px; }
 
-        .neural-bars { display: flex; gap: 3px; justify-content: center; margin-bottom: 24px; }
-        .neural-bars span {
-            width: 3px; border-radius: 2px;
-            background: var(--primary-container);
-            animation: pulse 1.2s ease-in-out infinite;
-        }
+        .neural-bars { display: flex; gap: 3px; justify-content: center; margin-bottom: 20px; }
+        .neural-bars span { width: 3px; border-radius: 2px; background: var(--primary-container); animation: pulse 1.2s ease-in-out infinite; }
         .neural-bars span:nth-child(1) { height: 12px; animation-delay: 0s; }
         .neural-bars span:nth-child(2) { height: 8px; animation-delay: 0.15s; }
         .neural-bars span:nth-child(3) { height: 16px; animation-delay: 0.3s; }
         .neural-bars span:nth-child(4) { height: 6px; animation-delay: 0.45s; }
         .neural-bars span:nth-child(5) { height: 14px; animation-delay: 0.6s; }
-        @keyframes pulse {
-            0%, 100% { transform: scaleY(1); opacity: 0.6; }
-            50% { transform: scaleY(1.8); opacity: 1; }
-        }
+        @keyframes pulse { 0%, 100% { transform: scaleY(1); opacity: 0.6; } 50% { transform: scaleY(1.8); opacity: 1; } }
 
-        .tagline {
-            font-size: 1.1rem; line-height: 1.6;
-            color: var(--on-surface);
-            margin-bottom: 8px;
-        }
+        .tagline { font-size: 1.05rem; line-height: 1.6; color: var(--on-surface); margin-bottom: 8px; }
         .tagline .highlight { color: var(--secondary); }
+        .system-label { font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 36px; }
 
-        .system-label {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.7rem; letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--on-surface-variant);
-            margin-bottom: 40px;
-        }
+        .form-card { background: var(--surface); border: 1px solid var(--outline); border-radius: 16px; padding: 32px; text-align: left; }
 
-        .form-card {
-            background: var(--surface);
-            border: 1px solid var(--outline);
-            border-radius: 16px;
-            padding: 32px;
-            text-align: left;
+        .tab-row { display: flex; margin-bottom: 24px; border-radius: 10px; overflow: hidden; border: 1px solid var(--outline); }
+        .tab-btn {
+            flex: 1; padding: 12px; text-align: center; font-family: 'Space Grotesk'; font-size: 0.8rem;
+            font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
+            background: transparent; border: none; color: var(--on-surface-variant); transition: all 0.2s;
         }
+        .tab-btn.active { background: var(--primary-container); color: white; }
 
-        .field-label {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.7rem; font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--on-surface-variant);
-            margin-bottom: 8px;
-        }
+        .field-label { font-family: 'Space Grotesk'; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 6px; margin-top: 16px; }
+        .field-label:first-of-type { margin-top: 0; }
 
         .input-field {
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--outline);
-            color: var(--on-surface);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            padding: 12px 0;
-            outline: none;
-            transition: border-color 0.3s;
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--outline);
+            color: var(--on-surface); font-family: 'Inter'; font-size: 0.95rem; padding: 12px 0;
+            outline: none; transition: border-color 0.3s;
         }
         .input-field:focus { border-bottom-color: var(--primary-container); box-shadow: 0 2px 8px rgba(99,102,241,0.15); }
-        .input-field::placeholder { color: var(--on-surface-variant); font-family: 'Inter', sans-serif; }
+        .input-field::placeholder { color: var(--on-surface-variant); }
 
-        .otp-section { margin-top: 24px; display: none; }
-        .otp-section.active { display: block; }
-
-        .otp-row {
-            display: flex; gap: 8px; justify-content: center; margin-top: 8px;
-        }
-        .otp-input {
-            width: 48px; height: 56px;
-            background: var(--surface-high);
-            border: 1px solid var(--outline);
-            border-radius: 8px;
-            color: var(--on-surface);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.4rem;
-            text-align: center;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .otp-input:focus { border-color: var(--primary-container); box-shadow: 0 0 12px rgba(99,102,241,0.2); }
-
-        .resend-link {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--on-surface-variant);
-            cursor: pointer;
-            float: right;
-            margin-bottom: 4px;
-        }
-        .resend-link:hover { color: var(--primary); }
+        .name-field { display: block; }
 
         .btn-primary {
-            width: 100%;
-            margin-top: 24px;
-            padding: 14px;
-            background: var(--primary-container);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.3s;
+            width: 100%; margin-top: 24px; padding: 14px; background: var(--primary-container);
+            color: white; border: none; border-radius: 8px; font-family: 'Space Grotesk';
+            font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+            cursor: pointer; transition: transform 0.15s, box-shadow 0.3s;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.3); }
         .btn-primary:active { transform: scale(0.97); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        .message {
-            margin-top: 16px;
-            font-size: 0.85rem;
-            text-align: center;
-            min-height: 20px;
-        }
+        .message { margin-top: 16px; font-size: 0.85rem; text-align: center; min-height: 20px; }
         .message.success { color: var(--secondary); }
         .message.error { color: var(--error); }
 
         .status-pill {
-            position: fixed; bottom: 24px; right: 24px;
-            display: flex; align-items: center; gap: 8px;
-            background: var(--surface-high);
-            border: 1px solid var(--outline);
-            border-radius: 24px;
-            padding: 8px 16px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--on-surface-variant);
+            position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 8px;
+            background: var(--surface-high); border: 1px solid var(--outline); border-radius: 24px;
+            padding: 8px 16px; font-family: 'Space Grotesk'; font-size: 0.7rem;
+            letter-spacing: 0.08em; text-transform: uppercase; color: var(--on-surface-variant);
         }
-        .status-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--secondary);
-            animation: blink 2s ease-in-out infinite;
-        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--secondary); animation: blink 2s ease-in-out infinite; }
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        .agents-info {
-            margin-top: 32px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .agent-chip {
-            background: var(--surface);
-            border: 1px solid rgba(99,102,241,0.15);
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 0.75rem;
-        }
-        .agent-chip .name {
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.8rem;
-        }
-        .agent-chip .desc {
-            color: var(--on-surface-variant);
-            margin-top: 4px;
-        }
+        .agents-info { margin-top: 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .agent-chip { background: var(--surface); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 12px 16px; font-size: 0.75rem; }
+        .agent-chip .name { font-weight: 600; color: var(--primary); font-size: 0.8rem; }
+        .agent-chip .desc { color: var(--on-surface-variant); margin-top: 4px; }
+
+        .password-hint { font-size: 0.7rem; color: var(--on-surface-variant); margin-top: 4px; }
     </style>
 </head>
 <body>
     <div class="top-bar">
         <div class="logo">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4edea3" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
+                <circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-3.5-6.5l-2.8 2.8m-5.4 5.4l-2.8 2.8m0-11l2.8 2.8m5.4 5.4l2.8 2.8"/>
             </svg>
             <span>NEXORA</span>
         </div>
@@ -245,74 +113,63 @@
 
     <div class="login-container">
         <h1>NEXORA</h1>
-        <div class="neural-bars">
-            <span></span><span></span><span></span><span></span><span></span>
-        </div>
+        <div class="neural-bars"><span></span><span></span><span></span><span></span><span></span></div>
         <p class="tagline">Your AI placement mentor. <span class="highlight">Knows you.</span><br>Guides you. Watches your back.</p>
         <p class="system-label">Multi-Agent Cognitive Platform v1.0</p>
 
         <div class="form-card">
-            <div id="email-section">
-                <p class="field-label">Identity Access</p>
-                <input type="email" id="email-input" class="input-field" placeholder="Enter your email address">
+            <div class="tab-row">
+                <button class="tab-btn active" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+                <button class="tab-btn" id="tab-login" onclick="switchTab('login')">Log In</button>
             </div>
 
-            <div id="otp-section" class="otp-section">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <p class="field-label">Verification Code</p>
-                    <span class="resend-link" onclick="sendOTP()">Resend Code</span>
-                </div>
-                <div class="otp-row">
-                    <input type="text" maxlength="1" class="otp-input" data-idx="0">
-                    <input type="text" maxlength="1" class="otp-input" data-idx="1">
-                    <input type="text" maxlength="1" class="otp-input" data-idx="2">
-                    <input type="text" maxlength="1" class="otp-input" data-idx="3">
-                    <input type="text" maxlength="1" class="otp-input" data-idx="4">
-                    <input type="text" maxlength="1" class="otp-input" data-idx="5">
-                </div>
+            <div id="name-section" class="name-field">
+                <p class="field-label">Full Name</p>
+                <input type="text" id="name-input" class="input-field" placeholder="Enter your full name" autocomplete="name">
             </div>
 
-            <button id="submit-btn" class="btn-primary" onclick="handleSubmit()">Send Verification Code</button>
+            <p class="field-label">Email Address</p>
+            <input type="email" id="email-input" class="input-field" placeholder="Enter your email" autocomplete="email">
+
+            <p class="field-label">Password</p>
+            <input type="password" id="password-input" class="input-field" placeholder="Enter your password" autocomplete="current-password">
+            <p class="password-hint" id="password-hint">Min 6 characters</p>
+
+            <button id="submit-btn" class="btn-primary" onclick="handleSubmit()">Create Account</button>
             <p id="message" class="message"></p>
         </div>
 
         <div class="agents-info">
-            <div class="agent-chip">
-                <div class="name">📄 ResumeAgent</div>
-                <div class="desc">PDF analysis & skill extraction</div>
-            </div>
-            <div class="agent-chip">
-                <div class="name">🤖 CoachAgent</div>
-                <div class="desc">AI career mentor with memory</div>
-            </div>
-            <div class="agent-chip">
-                <div class="name">🎤 InterviewAgent</div>
-                <div class="desc">Mock interviews & scoring</div>
-            </div>
-            <div class="agent-chip">
-                <div class="name">🚨 AlertAgent</div>
-                <div class="desc">Risk evaluation & alerts</div>
-            </div>
+            <div class="agent-chip"><div class="name">📄 ResumeAgent</div><div class="desc">PDF analysis & skill extraction</div></div>
+            <div class="agent-chip"><div class="name">🤖 CoachAgent</div><div class="desc">AI career mentor with memory</div></div>
+            <div class="agent-chip"><div class="name">🎤 InterviewAgent</div><div class="desc">Mock interviews & scoring</div></div>
+            <div class="agent-chip"><div class="name">🚨 AlertAgent</div><div class="desc">Risk evaluation & alerts</div></div>
         </div>
     </div>
 
     <div class="status-pill">
         <span class="status-dot"></span>
-        <span id="connection-status">Checking connection...</span>
+        <span id="connection-status">Checking...</span>
     </div>
+    <p style="position:fixed;bottom:8px;left:24px;font-size:0.65rem;color:var(--on-surface-variant);max-width:420px;line-height:1.4;">
+        Email signup uses a <strong style="color:var(--secondary);">confirmation link</strong> from Supabase (not a numeric OTP).
+        If the link fails, set <code style="font-family:JetBrains Mono,monospace;">NEXT_PUBLIC_APP_URL</code> to this origin and add
+        <code style="font-family:JetBrains Mono,monospace;">/auth/callback</code> under Supabase → Auth → Redirect URLs.
+        <a href="/api/system/status" style="color:var(--primary);">Check backend status</a>
+    </p>
 
     <script>
-        const API = '';  // Same origin
-        let currentEmail = '';
-        let otpSent = false;
+        const API = '';
+        let mode = 'signup'; // 'signup' or 'login'
 
-        // Check API health on load
+        // Check health
         async function checkHealth() {
             try {
-                const r = await fetch(`${API}/health`);
+                const r = await fetch(API + '/health');
                 const d = await r.json();
                 document.getElementById('api-status').textContent =
-                    `${d.services.supabase === 'connected' ? '✓' : '✗'} Supabase · ${d.services.pinecone === 'connected' ? '✓' : '✗'} Pinecone`;
+                    (d.services.supabase === 'connected' ? '✓ Supabase' : '✗ Supabase') + ' · ' +
+                    (d.services.pinecone === 'connected' ? '✓ Pinecone' : '✗ Pinecone');
                 document.getElementById('connection-status').textContent =
                     d.status === 'healthy' ? 'All Systems Online' : 'Degraded';
             } catch {
@@ -325,108 +182,84 @@
         // Check if already logged in
         const token = localStorage.getItem('nexora_token');
         if (token) {
-            fetch(`${API}/api/dashboard/student`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            }).then(r => {
-                if (r.ok) window.location.href = '/student';
-            });
+            fetch(API + '/api/dashboard/student', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(r => { if (r.ok) window.location.href = '/student'; });
         }
 
-        // OTP input auto-advance
-        document.querySelectorAll('.otp-input').forEach((inp, i, all) => {
-            inp.addEventListener('input', () => {
-                if (inp.value && i < all.length - 1) all[i + 1].focus();
-            });
-            inp.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !inp.value && i > 0) all[i - 1].focus();
-            });
-        });
+        function switchTab(tab) {
+            mode = tab;
+            document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+            document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+            document.getElementById('name-section').style.display = tab === 'signup' ? 'block' : 'none';
+            document.getElementById('password-hint').style.display = tab === 'signup' ? 'block' : 'none';
+            document.getElementById('submit-btn').textContent = tab === 'signup' ? 'Create Account' : 'Log In';
+            document.getElementById('message').textContent = '';
+        }
 
         function showMessage(text, type) {
             const m = document.getElementById('message');
             m.textContent = text;
-            m.className = `message ${type}`;
+            m.className = 'message ' + type;
         }
 
-        async function sendOTP() {
+        async function handleSubmit() {
             const email = document.getElementById('email-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const name = document.getElementById('name-input').value.trim();
+
             if (!email) return showMessage('Please enter your email', 'error');
+            if (!password) return showMessage('Please enter your password', 'error');
+            if (password.length < 6) return showMessage('Password must be at least 6 characters', 'error');
+            if (mode === 'signup' && !name) return showMessage('Please enter your name', 'error');
 
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.textContent = 'Sending...';
+            btn.textContent = mode === 'signup' ? 'Creating account...' : 'Logging in...';
 
             try {
-                const r = await fetch(`${API}/auth/send-otp`, {
+                const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/login';
+                const body = mode === 'signup'
+                    ? { email, password, name }
+                    : { email, password };
+
+                const r = await fetch(API + endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify(body)
                 });
                 const d = await r.json();
-                if (r.ok) {
-                    currentEmail = email;
-                    otpSent = true;
-                    document.getElementById('otp-section').classList.add('active');
-                    btn.textContent = 'Verify & Login';
-                    showMessage(`OTP sent to ${email}. Check your inbox.`, 'success');
-                    document.querySelector('.otp-input').focus();
-                } else {
-                    showMessage(d.detail || 'Failed to send OTP', 'error');
-                    btn.textContent = 'Send Verification Code';
-                }
-            } catch (e) {
-                showMessage('Network error. Is the server running?', 'error');
-                btn.textContent = 'Send Verification Code';
-            }
-            btn.disabled = false;
-        }
 
-        async function verifyOTP() {
-            const otpInputs = document.querySelectorAll('.otp-input');
-            const token = Array.from(otpInputs).map(i => i.value).join('');
-            if (token.length !== 6) return showMessage('Enter all 6 digits', 'error');
-
-            const btn = document.getElementById('submit-btn');
-            btn.disabled = true;
-            btn.textContent = 'Verifying...';
-
-            try {
-                const r = await fetch(`${API}/auth/verify-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentEmail, token })
-                });
-                const d = await r.json();
                 if (r.ok && d.success) {
-                    localStorage.setItem('nexora_token', d.access_token);
-                    localStorage.setItem('nexora_user', JSON.stringify(d.user));
-                    showMessage('Login successful! Redirecting...', 'success');
-                    setTimeout(() => window.location.href = '/student', 800);
+                    if (d.access_token) {
+                        localStorage.setItem('nexora_token', d.access_token);
+                        localStorage.setItem('nexora_user', JSON.stringify(d.user));
+                        showMessage('Success! Redirecting to dashboard...', 'success');
+                        setTimeout(function() { window.location.href = '/student'; }, 800);
+                    } else if (d.needs_confirmation) {
+                        var hint = d.message || 'Check your inbox for the confirmation link from Supabase.';
+                        if (d.auth_redirect_url) {
+                            hint += ' After clicking the link you should land on: ' + d.auth_redirect_url;
+                        }
+                        showMessage(hint, 'success');
+                        switchTab('login');
+                    }
+                } else if (r.status === 409) {
+                    showMessage(d.detail || 'Email already registered. Please log in.', 'error');
+                    switchTab('login');
                 } else {
-                    showMessage(d.detail || 'Invalid or expired OTP', 'error');
-                    btn.textContent = 'Verify & Login';
-                    btn.disabled = false;
+                    showMessage(d.detail || 'Something went wrong. Try again.', 'error');
                 }
             } catch (e) {
-                showMessage('Verification failed. Try again.', 'error');
-                btn.textContent = 'Verify & Login';
-                btn.disabled = false;
+                showMessage('Network error: ' + e.message, 'error');
             }
-        }
 
-        function handleSubmit() {
-            if (otpSent) verifyOTP();
-            else sendOTP();
+            btn.disabled = false;
+            btn.textContent = mode === 'signup' ? 'Create Account' : 'Log In';
         }
 
         // Enter key support
-        document.getElementById('email-input').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') handleSubmit();
-        });
-        document.querySelectorAll('.otp-input').forEach(inp => {
-            inp.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') handleSubmit();
-            });
+        document.querySelectorAll('.input-field').forEach(function(inp) {
+            inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSubmit(); });
         });
     </script>
 </body>

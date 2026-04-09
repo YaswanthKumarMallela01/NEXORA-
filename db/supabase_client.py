@@ -43,14 +43,22 @@ def get_anon_supabase() -> Client:
 
 def get_user(user_id: str) -> Optional[dict]:
     """Fetch a user by their Supabase auth UID."""
-    resp = get_supabase().table("users").select("*").eq("id", user_id).maybe_single().execute()
-    return resp.data
+    try:
+        resp = get_supabase().table("users").select("*").eq("id", user_id).limit(1).execute()
+        return resp.data[0] if resp.data else None
+    except Exception as e:
+        logger.warning(f"get_user failed for {user_id}: {e}")
+        return None
 
 
 def get_user_by_email(email: str) -> Optional[dict]:
     """Fetch a user by email."""
-    resp = get_supabase().table("users").select("*").eq("email", email).maybe_single().execute()
-    return resp.data
+    try:
+        resp = get_supabase().table("users").select("*").eq("email", email).limit(1).execute()
+        return resp.data[0] if resp.data else None
+    except Exception as e:
+        logger.warning(f"get_user_by_email failed for {email}: {e}")
+        return None
 
 
 def upsert_user(data: dict) -> dict:
@@ -166,15 +174,19 @@ def create_interview_session(data: dict) -> dict:
 
 def get_interview_session(session_id: str) -> Optional[dict]:
     """Fetch a specific interview session."""
-    resp = (
-        get_supabase()
-        .table("interview_sessions")
-        .select("*")
-        .eq("id", session_id)
-        .maybe_single()
-        .execute()
-    )
-    return resp.data
+    try:
+        resp = (
+            get_supabase()
+            .table("interview_sessions")
+            .select("*")
+            .eq("id", session_id)
+            .limit(1)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+    except Exception as e:
+        logger.warning(f"get_interview_session failed: {e}")
+        return None
 
 
 def update_interview_session(session_id: str, updates: dict) -> dict:
@@ -258,17 +270,20 @@ def save_roadmap(data: dict) -> dict:
 
 def get_roadmap(user_id: str) -> Optional[dict]:
     """Get the latest roadmap for a user."""
-    resp = (
-        get_supabase()
-        .table("roadmap")
-        .select("*")
-        .eq("user_id", user_id)
-        .order("generated_at", desc=True)
-        .limit(1)
-        .maybe_single()
-        .execute()
-    )
-    return resp.data
+    try:
+        resp = (
+            get_supabase()
+            .table("roadmap")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("generated_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        return resp.data[0] if resp.data else None
+    except Exception as e:
+        logger.warning(f"get_roadmap failed for {user_id}: {e}")
+        return None
 
 
 # ────────────────────────────────────────────────────────────
@@ -278,10 +293,30 @@ def get_roadmap(user_id: str) -> Optional[dict]:
 def get_student_dashboard(user_id: str) -> dict:
     """Aggregate all data for the student dashboard."""
     user = get_user(user_id) or {}
-    tasks = get_tasks(user_id)
-    sessions = get_user_interview_sessions(user_id)
-    alerts = get_alerts(user_id, acknowledged=False)
-    roadmap = get_roadmap(user_id)
+
+    try:
+        tasks = get_tasks(user_id)
+    except Exception as e:
+        logger.warning(f"Dashboard: tasks query failed: {e}")
+        tasks = []
+
+    try:
+        sessions = get_user_interview_sessions(user_id)
+    except Exception as e:
+        logger.warning(f"Dashboard: interviews query failed: {e}")
+        sessions = []
+
+    try:
+        alerts = get_alerts(user_id, acknowledged=False)
+    except Exception as e:
+        logger.warning(f"Dashboard: alerts query failed: {e}")
+        alerts = []
+
+    try:
+        roadmap = get_roadmap(user_id)
+    except Exception as e:
+        logger.warning(f"Dashboard: roadmap query failed: {e}")
+        roadmap = None
 
     pending = [t for t in tasks if t.get("status") == "pending"]
     completed = [t for t in tasks if t.get("status") == "completed"]

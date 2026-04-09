@@ -25,6 +25,7 @@ from api.routes import (
     dashboard_router,
     alerts_router,
     tasks_router,
+    system_router,
 )
 
 # ────────────────────────────────────────────────────────────
@@ -123,6 +124,7 @@ app.include_router(interview_router)
 app.include_router(dashboard_router)
 app.include_router(alerts_router)
 app.include_router(tasks_router)
+app.include_router(system_router)
 
 # ── Static files (frontend assets if any) ──
 if FRONTEND_DIR.exists():
@@ -151,6 +153,12 @@ async def root():
 async def login_page():
     """Landing & Login page — Neural Minimalism design."""
     return _serve_page("login.html")
+
+
+@app.get("/auth/callback", tags=["Frontend"], include_in_schema=False)
+async def auth_callback_page():
+    """Supabase email-confirmation redirect — stores tokens from URL hash."""
+    return _serve_page("auth-callback.html")
 
 
 @app.get("/student", tags=["Frontend"], include_in_schema=False)
@@ -238,12 +246,14 @@ async def api_info():
         ],
         "frontend_pages": [
             "/login — Landing & Authentication",
+            "/auth/callback — Email confirmation redirect (Supabase)",
             "/student — Student Dashboard",
             "/coach — AI Career Coach Chat",
             "/interview — Mock Interview Simulator",
             "/roadmap — Career Roadmap",
             "/tpc — TPC Admin Dashboard",
         ],
+        "diagnostics": "/api/system/status",
     }
 
 

@@ -5,7 +5,6 @@ and session scoring. Uses Gemini 1.5 Flash for large context tracking.
 
 LLM: Google Gemini 1.5 Flash
 State: Interview sessions persisted in Supabase (interview_sessions table)
-Tools: question_generator, answer_evaluator
 Output: { question, feedback, session_score }
 """
 
@@ -13,11 +12,9 @@ import json
 import logging
 from typing import Optional, List, Dict
 
-from langchain_core.tools import tool
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_core.messages import HumanMessage, SystemMessage
 
-from chains.orchestrator import get_agent_llm
+from chains.orchestrator import get_gemini_llm, get_groq_llm
 from db.supabase_client import (
     create_interview_session,
     get_interview_session,
@@ -30,27 +27,29 @@ logger = logging.getLogger("nexora.agents.interview")
 
 
 # ────────────────────────────────────────────────────────────
-#  Tools
+#  LLM helper — Gemini primary, Groq fallback
 # ────────────────────────────────────────────────────────────
 
-@tool
-def question_generator(context: str) -> str:
-    """
-    Generate a role-specific interview question based on the interview context.
-    Input: JSON string with keys: role, question_number, previous_topics (list of already asked topics).
-    Output: JSON with the generated question and its metadata.
-    """
+def _call_llm(prompt: str, temperature: float = 0.4) -> str:
+    """Call Gemini, fall back to Groq if it fails."""
+    from langchain_core.messages import HumanMessage as HM
     try:
-        ctx = json.loads(context)
-    except json.JSONDecodeError:
-        ctx = {"role": context, "question_number": 1, "previous_topics": []}
+        llm = get_gemini_llm(temperature=temperature, max_tokens=4096)
+        response = llm.invoke([HM(content=prompt)])
+        return response.content.strip()
+    except Exception as e:
+        logger.warning(f"Gemini failed, trying Groq: {e}")
+        llm = get_groq_llm(temperature=temperature, max_tokens=4096)
+        response = llm.invoke([HM(content=prompt)])
+        return response.content.strip()
 
-    role = ctx.get("role", "Software Engineer")
-    q_num = ctx.get("question_number", 1)
-    prev_topics = ctx.get("previous_topics", [])
 
-    llm = get_agent_llm("interview", temperature=0.6)
+# ────────────────────────────────────────────────────────────
+#  Question Generation
+# ────────────────────────────────────────────────────────────
 
+def _generate_question(role: str, q_num: int, prev_topics: list) -> dict:
+    """Generate a role-specific interview question."""
     prompt = f"""You are an expert technical interviewer for the role of {role}.
 Generate interview question #{q_num}.
 
@@ -62,25 +61,24 @@ Rules:
 - Mix difficulty: 1 easy, 2 medium, 1 hard, 1 medium
 - Be specific and realistic — like a real company interview
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown, no ```):
 {{
     "question_number": {q_num},
     "question": "The interview question",
-    "type": "technical|behavioral|system_design",
-    "difficulty": "easy|medium|hard",
-    "topic": "specific topic (e.g., arrays, react, leadership)",
+    "type": "technical or behavioral or system_design",
+    "difficulty": "easy or medium or hard",
+    "topic": "specific topic like arrays or react or leadership",
     "expected_duration_minutes": 5,
     "hints": ["hint1 if needed"]
 }}"""
 
     try:
-        response = llm.invoke(prompt)
-        content = _clean_json(response.content.strip())
-        json.loads(content)
-        return content
+        raw = _call_llm(prompt, temperature=0.6)
+        cleaned = _clean_json(raw)
+        return json.loads(cleaned)
     except Exception as e:
         logger.error(f"Question generation failed: {e}")
-        return json.dumps({
+        return {
             "question_number": q_num,
             "question": f"Tell me about a challenging project you've worked on for a {role} position.",
             "type": "behavioral",
@@ -88,29 +86,15 @@ Return ONLY valid JSON:
             "topic": "project experience",
             "expected_duration_minutes": 5,
             "hints": [],
-        })
+        }
 
 
-@tool
-def answer_evaluator(evaluation_input: str) -> str:
-    """
-    Evaluate a candidate's answer to an interview question.
-    Scores on 5 dimensions and provides structured feedback.
-    Input: JSON string with keys: question, answer, role, question_type.
-    Output: JSON with scores and detailed feedback.
-    """
-    try:
-        data = json.loads(evaluation_input)
-    except json.JSONDecodeError:
-        return json.dumps({"error": "Invalid input JSON"})
+# ────────────────────────────────────────────────────────────
+#  Answer Evaluation
+# ────────────────────────────────────────────────────────────
 
-    question = data.get("question", "")
-    answer = data.get("answer", "")
-    role = data.get("role", "Software Engineer")
-    q_type = data.get("question_type", "technical")
-
-    llm = get_agent_llm("interview", temperature=0.2)
-
+def _evaluate_answer(question: str, answer: str, role: str, q_type: str = "technical") -> dict:
+    """Evaluate a candidate's answer to an interview question."""
     prompt = f"""You are a senior technical interviewer evaluating a candidate for {role}.
 
 Question ({q_type}): {question}
@@ -123,15 +107,15 @@ Evaluate the answer on these 5 dimensions (score 1-10 each):
 4. Relevance — how well it addresses the question
 5. Depth — level of detail and understanding
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown, no ```):
 {{
     "scores": {{
-        "technical_accuracy": 0,
-        "communication": 0,
-        "problem_solving": 0,
-        "relevance": 0,
-        "depth": 0,
-        "average": 0.0
+        "technical_accuracy": 7,
+        "communication": 7,
+        "problem_solving": 7,
+        "relevance": 7,
+        "depth": 7,
+        "average": 7.0
     }},
     "feedback": {{
         "strengths": ["strength1", "strength2"],
@@ -145,10 +129,9 @@ Return ONLY valid JSON:
 A pass requires average >= 6.0. Be fair but rigorous."""
 
     try:
-        response = llm.invoke(prompt)
-        content = _clean_json(response.content.strip())
-
-        result = json.loads(content)
+        raw = _call_llm(prompt, temperature=0.2)
+        cleaned = _clean_json(raw)
+        result = json.loads(cleaned)
 
         # Calculate average if not provided
         scores = result.get("scores", {})
@@ -157,74 +140,17 @@ A pass requires average >= 6.0. Be fair but rigorous."""
         scores["average"] = round(sum(values) / len(values), 2)
         result["scores"] = scores
         result["pass"] = scores["average"] >= 6.0
+        return result
 
-        return json.dumps(result)
     except Exception as e:
         logger.error(f"Answer evaluation failed: {e}")
-        return json.dumps({
-            "scores": {"average": 5.0},
-            "feedback": {"overall_comment": "Evaluation encountered an error. Please try again."},
-            "error": str(e),
-        })
-
-
-# ────────────────────────────────────────────────────────────
-#  Agent Setup
-# ────────────────────────────────────────────────────────────
-
-INTERVIEW_SYSTEM_PROMPT = """You are NEXORA's Interview Agent — a professional mock interviewer.
-
-You are conducting a structured mock interview for the role of: {role}
-
-YOUR BEHAVIOR:
-- You ask ONE question at a time, then wait for the answer
-- After each answer, you evaluate it using answer_evaluator
-- You maintain a running score throughout the session
-- You adapt difficulty based on performance
-- Standard session: 5 questions (3 technical + 2 behavioral)
-
-STUDENT PROFILE:
-{student_profile}
-
-SESSION STATE:
-Questions asked so far: {questions_asked}
-Current question number: {current_question}
-Running score: {running_score}
-
-After evaluation, present the feedback in a clear, encouraging format.
-Always end with the next question OR the session summary if all questions are done."""
-
-
-def create_interview_agent(role: str, student_profile: dict, session_state: dict) -> AgentExecutor:
-    """Create an InterviewAgent for a specific role and session."""
-    llm = get_agent_llm("interview", temperature=0.4, max_tokens=8192)
-    tools = [question_generator, answer_evaluator]
-
-    questions_asked = session_state.get("questions_asked", [])
-    current_q = session_state.get("current_question", 1)
-    running_score = session_state.get("running_score", "N/A")
-
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", INTERVIEW_SYSTEM_PROMPT.format(
-            role=role,
-            student_profile=json.dumps(student_profile),
-            questions_asked=json.dumps(questions_asked),
-            current_question=str(current_q),
-            running_score=str(running_score),
-        )),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
-
-    agent = create_tool_calling_agent(llm, tools, prompt)
-    return AgentExecutor(
-        agent=agent,
-        tools=tools,
-        verbose=True,
-        max_iterations=6,
-        handle_parsing_errors=True,
-        return_intermediate_steps=True,
-    )
+        return {
+            "scores": {"technical_accuracy": 5, "communication": 5, "problem_solving": 5,
+                       "relevance": 5, "depth": 5, "average": 5.0},
+            "feedback": {"strengths": [], "improvements": ["Could not fully evaluate"],
+                         "overall_comment": "Please try again with a more detailed answer."},
+            "pass": False,
+        }
 
 
 # ────────────────────────────────────────────────────────────
@@ -250,47 +176,26 @@ async def start_interview(user_id: str, role: str) -> dict:
     if not session:
         return {"success": False, "error": "Failed to create interview session"}
 
-    # Generate first question using agent
-    user = get_user(user_id) or {}
-    session_state = {"questions_asked": [], "current_question": 1, "running_score": "N/A"}
-    agent = create_interview_agent(role, user.get("skill_profile", {}), session_state)
+    # Generate first question
+    question_data = _generate_question(role, 1, [])
 
-    try:
-        result = agent.invoke({
-            "input": f"Start the interview. Generate the first question for a {role} position."
-        })
+    # Update session
+    update_interview_session(session["id"], {
+        "questions": [question_data],
+    })
 
-        output = result.get("output", "")
-
-        # Try to extract question JSON from tool results
-        question_data = _extract_tool_result(result, "question_generator")
-
-        # Update session with first question
-        if question_data:
-            update_interview_session(session["id"], {
-                "questions": [question_data],
-            })
-
-        return {
-            "success": True,
-            "session_id": session["id"],
-            "role": role,
-            "response": output,
-            "question": question_data,
-            "question_number": 1,
-            "total_questions": 5,
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to start interview: {e}")
-        return {"success": False, "error": str(e), "session_id": session.get("id")}
+    return {
+        "success": True,
+        "session_id": session["id"],
+        "role": role,
+        "response": f"Welcome to your mock interview for **{role}**! I'll ask you 5 questions — 3 technical and 2 behavioral. Take your time with each answer.\n\nHere's your first question:",
+        "question": question_data,
+        "question_number": 1,
+        "total_questions": 5,
+    }
 
 
-async def submit_answer(
-    user_id: str,
-    session_id: str,
-    answer: str,
-) -> dict:
+async def submit_answer(user_id: str, session_id: str, answer: str) -> dict:
     """
     Submit an answer to the current interview question.
     Evaluates the answer and generates the next question (or summary).
@@ -306,87 +211,93 @@ async def submit_answer(
     scores = session.get("scores", {"per_question": [], "running_average": 0})
 
     current_q_num = len(questions)
-    is_last = current_q_num >= 5
+    if current_q_num == 0:
+        return {"success": False, "error": "No question to answer"}
 
-    # Add answer to session
+    is_last = current_q_num >= 5
+    current_question = questions[-1]
+
+    # Add answer
     answers.append({"question_number": current_q_num, "answer": answer})
 
-    user = get_user(user_id) or {}
+    # Evaluate the answer
+    q_text = current_question.get("question", "") if isinstance(current_question, dict) else str(current_question)
+    q_type = current_question.get("type", "technical") if isinstance(current_question, dict) else "technical"
     role = session.get("role", "Software Engineer")
 
-    # Build context for the agent
-    prev_topics = [q.get("topic", "") for q in questions if isinstance(q, dict)]
-    session_state = {
-        "questions_asked": prev_topics,
-        "current_question": current_q_num + 1,
-        "running_score": scores.get("running_average", "N/A"),
-    }
+    eval_data = _evaluate_answer(q_text, answer, role, q_type)
 
-    agent = create_interview_agent(role, user.get("skill_profile", {}), session_state)
+    # Update scores
+    scores["per_question"].append(eval_data.get("scores", {}))
+    all_avgs = [s.get("average", 5) for s in scores["per_question"]]
+    scores["running_average"] = round(sum(all_avgs) / len(all_avgs), 2)
 
-    if is_last:
-        input_text = f"""Evaluate this answer and then provide a FINAL SESSION SUMMARY.
+    # Generate next question or summary
+    next_question = None
+    response_text = ""
 
-Question: {json.dumps(questions[-1]) if questions else 'N/A'}
-Answer: {answer}
+    if not is_last:
+        prev_topics = [q.get("topic", "") for q in questions if isinstance(q, dict)]
+        next_question = _generate_question(role, current_q_num + 1, prev_topics)
+        questions.append(next_question)
 
-This was the last question. After evaluation, summarize the entire session:
-- Overall score
-- Key strengths
-- Areas to improve
-- Final recommendation (Ready / Needs Practice / Not Ready)"""
+        avg_score = eval_data.get("scores", {}).get("average", 5)
+        feedback = eval_data.get("feedback", {})
+        strengths = ", ".join(feedback.get("strengths", [])[:2])
+        improvements = ", ".join(feedback.get("improvements", [])[:2])
+
+        response_text = f"""**Score: {avg_score}/10**
+
+{'✅ **Strengths:** ' + strengths if strengths else ''}
+{'⚠️ **To improve:** ' + improvements if improvements else ''}
+
+{feedback.get('overall_comment', '')}
+
+---
+
+**Question {current_q_num + 1} of 5:**"""
     else:
-        input_text = f"""Evaluate this answer, then generate the NEXT question.
+        # Last question — generate summary
+        feedback = eval_data.get("feedback", {})
+        final_score = scores["running_average"]
+        readiness = "Ready for Interviews! 🎉" if final_score >= 7 else "Needs More Practice 📚" if final_score >= 5 else "Keep Practicing 💪"
 
-Question: {json.dumps(questions[-1]) if questions else 'N/A'}
-Answer: {answer}
-Previous topics covered: {json.dumps(prev_topics)}
-Next question number: {current_q_num + 1}"""
+        response_text = f"""**Final Answer Score: {eval_data.get('scores', {}).get('average', 5)}/10**
 
-    try:
-        result = agent.invoke({"input": input_text})
+{feedback.get('overall_comment', '')}
 
-        output = result.get("output", "")
+---
 
-        # Extract evaluation scores from tool results
-        eval_data = _extract_tool_result(result, "answer_evaluator")
-        if eval_data:
-            scores["per_question"].append(eval_data.get("scores", {}))
-            all_avgs = [s.get("average", 5) for s in scores["per_question"]]
-            scores["running_average"] = round(sum(all_avgs) / len(all_avgs), 2)
+## 📊 Interview Complete!
 
-        # Extract next question if not last
-        next_question = None
-        if not is_last:
-            next_question = _extract_tool_result(result, "question_generator")
-            if next_question:
-                questions.append(next_question)
+**Overall Score: {final_score}/10**
+**Verdict: {readiness}**
 
-        # Update session in DB
-        update_interview_session(session_id, {
-            "questions": questions,
-            "answers": answers,
-            "scores": scores,
-        })
+**Per-question scores:**
+"""
+        for i, qs in enumerate(scores["per_question"]):
+            response_text += f"  Q{i+1}: {qs.get('average', 'N/A')}/10\n"
 
-        # If last question, save final score to user profile
-        if is_last:
-            _save_final_score(user_id, session_id, scores)
+        # Save to user profile
+        _save_final_score(user_id, session_id, scores)
 
-        return {
-            "success": True,
-            "session_id": session_id,
-            "response": output,
-            "feedback": eval_data,
-            "next_question": next_question,
-            "question_number": current_q_num + (0 if is_last else 1),
-            "session_score": scores.get("running_average", 0),
-            "is_complete": is_last,
-        }
+    # Update session in DB
+    update_interview_session(session_id, {
+        "questions": questions,
+        "answers": answers,
+        "scores": scores,
+    })
 
-    except Exception as e:
-        logger.error(f"Answer evaluation failed: {e}")
-        return {"success": False, "error": str(e)}
+    return {
+        "success": True,
+        "session_id": session_id,
+        "response": response_text,
+        "feedback": eval_data,
+        "next_question": next_question,
+        "question_number": current_q_num + (0 if is_last else 1),
+        "session_score": scores.get("running_average", 0),
+        "is_complete": is_last,
+    }
 
 
 async def get_session_summary(session_id: str) -> dict:
@@ -399,7 +310,6 @@ async def get_session_summary(session_id: str) -> dict:
     questions = session.get("questions", [])
     answers = session.get("answers", [])
 
-    # Build Q&A pairs
     qa_pairs = []
     per_q_scores = scores.get("per_question", [])
     for i, q in enumerate(questions):
@@ -425,19 +335,6 @@ async def get_session_summary(session_id: str) -> dict:
 # ────────────────────────────────────────────────────────────
 #  Helpers
 # ────────────────────────────────────────────────────────────
-
-def _extract_tool_result(result: dict, tool_name: str) -> Optional[dict]:
-    """Extract parsed tool output from agent intermediate steps."""
-    steps = result.get("intermediate_steps", [])
-    for step in steps:
-        action, observation = step
-        if action.tool == tool_name:
-            try:
-                return json.loads(observation)
-            except (json.JSONDecodeError, TypeError):
-                pass
-    return None
-
 
 def _save_final_score(user_id: str, session_id: str, scores: dict):
     """Save final interview score to user's interview_scores array."""

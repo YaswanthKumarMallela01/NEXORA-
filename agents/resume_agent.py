@@ -4,7 +4,7 @@ Analyzes uploaded PDF resumes: extracts skills, matches against JDs from RAG,
 and produces a structured readiness assessment.
 
 LLM: Groq (llama-3.1-70b) with Together AI fallback
-Tools: pdf_parser, skill_extractor, jd_matcher
+Pipeline: pdf_parser → skill_extractor → jd_matcher
 Output: JSON { found_skills[], missing_skills[], match_scores{}, readiness_score, summary }
 """
 
@@ -14,11 +14,10 @@ import logging
 from typing import Optional, List, Dict
 
 import fitz  # PyMuPDF
-from langchain_core.tools import tool
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.agents import AgentExecutor, create_tool_calling_agent
 
-from chains.orchestrator import get_agent_llm
+from langchain_core.messages import HumanMessage
+
+from chains.orchestrator import get_groq_llm, get_together_llm
 from rag.retriever import get_job_descriptions, build_context_string
 from db.supabase_client import update_skill_profile, update_readiness_score
 
@@ -26,16 +25,28 @@ logger = logging.getLogger("nexora.agents.resume")
 
 
 # ────────────────────────────────────────────────────────────
-#  Tools
+#  LLM helper
 # ────────────────────────────────────────────────────────────
 
-@tool
-def pdf_parser(pdf_base64: str) -> str:
-    """
-    Extract text content from a base64-encoded PDF file.
-    Input: base64 string of the PDF file.
-    Output: extracted text content from all pages.
-    """
+def _call_llm(prompt: str, temperature: float = 0.1) -> str:
+    """Call Groq, fall back to Together AI."""
+    try:
+        llm = get_groq_llm(temperature=temperature, max_tokens=4096)
+        response = llm.invoke([HumanMessage(content=prompt)])
+        return response.content.strip()
+    except Exception as e:
+        logger.warning(f"Groq failed, trying Together AI: {e}")
+        llm = get_together_llm(temperature=temperature, max_tokens=4096)
+        response = llm.invoke([HumanMessage(content=prompt)])
+        return response.content.strip()
+
+
+# ────────────────────────────────────────────────────────────
+#  Step 1: PDF Parser
+# ────────────────────────────────────────────────────────────
+
+def parse_pdf(pdf_base64: str) -> str:
+    """Extract text content from a base64-encoded PDF file."""
     try:
         pdf_bytes = base64.b64decode(pdf_base64)
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
@@ -54,22 +65,19 @@ def pdf_parser(pdf_base64: str) -> str:
         return f"ERROR: Failed to parse PDF — {str(e)}"
 
 
-@tool
-def skill_extractor(resume_text: str) -> str:
-    """
-    Analyze resume text to extract skills, experience, and projects.
-    Input: raw text extracted from a resume.
-    Output: JSON with categorized skills, experience summary, and projects.
-    """
-    llm = get_agent_llm("resume", temperature=0.1)
+# ────────────────────────────────────────────────────────────
+#  Step 2: Skill Extraction
+# ────────────────────────────────────────────────────────────
 
+def extract_skills(resume_text: str) -> dict:
+    """Analyze resume text to extract skills, experience, and projects."""
     prompt = f"""Analyze this resume text and extract structured information.
-Return ONLY valid JSON (no markdown, no code blocks) with this exact structure:
+Return ONLY valid JSON (no markdown, no ``` blocks) with this exact structure:
 {{
-    "technical_skills": ["skill1", "skill2", ...],
-    "soft_skills": ["skill1", "skill2", ...],
-    "programming_languages": ["lang1", "lang2", ...],
-    "frameworks_tools": ["framework1", "tool1", ...],
+    "technical_skills": ["skill1", "skill2"],
+    "soft_skills": ["skill1", "skill2"],
+    "programming_languages": ["lang1", "lang2"],
+    "frameworks_tools": ["framework1", "tool1"],
     "experience_years": 0,
     "education": "degree and institution",
     "projects": [
@@ -83,42 +91,26 @@ Resume Text:
 {resume_text[:5000]}"""
 
     try:
-        response = llm.invoke(prompt)
-        content = response.content.strip()
-        content = _clean_json(content)
-        # Validate JSON
-        json.loads(content)
-        return content
-    except json.JSONDecodeError:
-        return json.dumps({
-            "technical_skills": [],
-            "soft_skills": [],
-            "programming_languages": [],
-            "frameworks_tools": [],
-            "experience_years": 0,
-            "education": "Not specified",
-            "projects": [],
-            "certifications": [],
-            "summary": "Could not parse resume details.",
-        })
+        raw = _call_llm(prompt, temperature=0.1)
+        cleaned = _clean_json(raw)
+        return json.loads(cleaned)
     except Exception as e:
         logger.error(f"Skill extraction failed: {e}")
-        return json.dumps({"error": str(e)})
+        return {
+            "technical_skills": [], "soft_skills": [],
+            "programming_languages": [], "frameworks_tools": [],
+            "experience_years": 0, "education": "Not specified",
+            "projects": [], "certifications": [],
+            "summary": "Could not parse resume details.",
+        }
 
 
-@tool
-def jd_matcher(skills_json: str) -> str:
-    """
-    Fetch top 5 job descriptions from RAG and compare candidate skills against them.
-    Input: JSON string of extracted skills from skill_extractor.
-    Output: JSON with match scores per JD and missing skills.
-    """
-    try:
-        skills_data = json.loads(skills_json)
-    except json.JSONDecodeError:
-        return json.dumps({"error": "Invalid skills JSON input"})
+# ────────────────────────────────────────────────────────────
+#  Step 3: JD Matching
+# ────────────────────────────────────────────────────────────
 
-    # Build a query from the candidate's skills
+def match_against_jds(skills_data: dict) -> dict:
+    """Match candidate skills against job descriptions from RAG."""
     all_skills = (
         skills_data.get("technical_skills", [])
         + skills_data.get("programming_languages", [])
@@ -126,29 +118,25 @@ def jd_matcher(skills_json: str) -> str:
     )
     query = f"Job requirements matching skills: {', '.join(all_skills)}"
 
-    # Fetch JDs from RAG
     jd_docs = get_job_descriptions(query, top_k=5)
 
     if not jd_docs:
-        return json.dumps({
+        return {
             "match_scores": {},
-            "missing_skills": [],
-            "message": "No job descriptions found in knowledge base.",
-        })
-
-    # Use LLM to compare skills against JDs
-    llm = get_agent_llm("resume", temperature=0.1)
+            "overall_missing_skills": [],
+            "message": "No job descriptions found in knowledge base. Score based on skill analysis only.",
+        }
 
     jd_context = build_context_string(jd_docs)
     prompt = f"""Compare this candidate's skills against these job descriptions.
-Return ONLY valid JSON (no markdown) with this structure:
+Return ONLY valid JSON (no markdown, no ``` blocks) with this structure:
 {{
     "match_scores": {{
-        "JD_source_1": {{"score": 0, "matched_skills": [...], "gaps": [...]}},
-        "JD_source_2": {{"score": 0, "matched_skills": [...], "gaps": [...]}}
+        "JD_1": {{"score": 72, "matched_skills": ["skill1"], "gaps": ["gap1"]}},
+        "JD_2": {{"score": 65, "matched_skills": ["skill1"], "gaps": ["gap1"]}}
     }},
     "overall_missing_skills": ["skill1", "skill2"],
-    "strongest_match": "JD_source_name",
+    "strongest_match": "JD_name",
     "weakest_areas": ["area1", "area2"]
 }}
 
@@ -159,66 +147,59 @@ Job Descriptions:
 {jd_context}"""
 
     try:
-        response = llm.invoke(prompt)
-        content = _clean_json(response.content.strip())
-        json.loads(content)
-        return content
+        raw = _call_llm(prompt, temperature=0.1)
+        cleaned = _clean_json(raw)
+        return json.loads(cleaned)
     except Exception as e:
         logger.error(f"JD matching failed: {e}")
-        return json.dumps({"error": str(e), "match_scores": {}})
+        return {"match_scores": {}, "overall_missing_skills": [], "error": str(e)}
 
 
 # ────────────────────────────────────────────────────────────
-#  Agent Setup
+#  Step 4: Readiness Assessment
 # ────────────────────────────────────────────────────────────
 
-SYSTEM_PROMPT = """You are NEXORA's Resume Analysis Agent — a precision placement readiness assessor.
-
-Your job:
-1. Parse the uploaded PDF resume using the pdf_parser tool
-2. Extract all skills, experience, and projects using skill_extractor
-3. Match the candidate's profile against real job descriptions using jd_matcher
-4. Synthesize everything into a final readiness assessment
-
-You MUST call all three tools in sequence: pdf_parser → skill_extractor → jd_matcher.
-
-After getting all tool results, provide a final JSON response with this EXACT structure:
+def assess_readiness(skills_data: dict, jd_match: dict) -> dict:
+    """Calculate readiness score and generate final assessment."""
+    prompt = f"""Based on this candidate analysis, provide a final readiness assessment.
+Return ONLY valid JSON (no markdown):
 {{
-    "found_skills": ["skill1", "skill2", ...],
-    "missing_skills": ["skill1", "skill2", ...],
-    "match_scores": {{"jd_name": score, ...}},
-    "readiness_score": 0-100,
-    "summary": "A comprehensive 2-3 paragraph readiness assessment"
+    "readiness_score": 0,
+    "summary": "2-3 paragraph assessment",
+    "strengths": ["strength1", "strength2"],
+    "critical_gaps": ["gap1", "gap2"],
+    "recommended_actions": ["action1", "action2"]
 }}
 
-Be thorough, precise, and constructive. The readiness_score should reflect:
+Scoring guide:
 - 0-30: Not ready — critical skill gaps
 - 31-50: Needs work — significant gaps but foundation exists
 - 51-70: Getting there — some gaps, focused preparation needed
 - 71-85: Ready — minor gaps, strong candidate
-- 86-100: Highly ready — excellent match across JDs"""
+- 86-100: Highly ready — excellent match
 
+Skills Profile:
+{json.dumps(skills_data, indent=2)[:2000]}
 
-def create_resume_agent() -> AgentExecutor:
-    """Create and return the ResumeAgent with all tools."""
-    llm = get_agent_llm("resume", temperature=0.2)
-    tools = [pdf_parser, skill_extractor, jd_matcher]
+JD Match Results:
+{json.dumps(jd_match, indent=2)[:2000]}"""
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", SYSTEM_PROMPT),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
-
-    agent = create_tool_calling_agent(llm, tools, prompt)
-    return AgentExecutor(
-        agent=agent,
-        tools=tools,
-        verbose=True,
-        max_iterations=10,
-        handle_parsing_errors=True,
-        return_intermediate_steps=True,
-    )
+    try:
+        raw = _call_llm(prompt, temperature=0.2)
+        cleaned = _clean_json(raw)
+        return json.loads(cleaned)
+    except Exception as e:
+        logger.error(f"Readiness assessment failed: {e}")
+        # Compute basic score from available data
+        skill_count = len(skills_data.get("technical_skills", []))
+        base_score = min(skill_count * 8, 60)
+        return {
+            "readiness_score": base_score,
+            "summary": f"Found {skill_count} technical skills. Further analysis needed.",
+            "strengths": skills_data.get("technical_skills", [])[:3],
+            "critical_gaps": [],
+            "recommended_actions": ["Upload your resume again for a complete analysis"],
+        }
 
 
 # ────────────────────────────────────────────────────────────
@@ -227,47 +208,57 @@ def create_resume_agent() -> AgentExecutor:
 
 async def analyze_resume(user_id: str, pdf_base64: str) -> dict:
     """
-    Full resume analysis pipeline.
-
-    1. Runs ResumeAgent (pdf_parser → skill_extractor → jd_matcher)
-    2. Parses structured output
-    3. Saves results to Supabase
-    4. Returns analysis results
+    Full resume analysis pipeline:
+    1. Parse PDF → extract text
+    2. Extract skills from text
+    3. Match against JDs from RAG
+    4. Generate readiness assessment
+    5. Save to Supabase
     """
     logger.info(f"Starting resume analysis for user {user_id}")
 
-    agent = create_resume_agent()
-
     try:
-        result = agent.invoke({
-            "input": f"Analyze this resume (base64-encoded PDF): {pdf_base64}"
-        })
+        # Step 1: Parse PDF
+        resume_text = parse_pdf(pdf_base64)
+        if resume_text.startswith("ERROR"):
+            return {"success": False, "error": resume_text}
 
-        output = result.get("output", "")
+        # Step 2: Extract skills
+        skills_data = extract_skills(resume_text)
 
-        # Try to parse JSON from agent output
-        analysis = _extract_json(output)
+        # Step 3: Match against JDs
+        jd_match = match_against_jds(skills_data)
 
-        if analysis:
-            # Save to Supabase
-            update_skill_profile(user_id, analysis)
+        # Step 4: Readiness assessment
+        assessment = assess_readiness(skills_data, jd_match)
 
-            readiness = analysis.get("readiness_score", 0)
-            update_readiness_score(user_id, readiness)
+        # Build final result
+        found_skills = (
+            skills_data.get("technical_skills", [])
+            + skills_data.get("programming_languages", [])
+            + skills_data.get("frameworks_tools", [])
+        )
+        missing_skills = jd_match.get("overall_missing_skills", [])
+        readiness_score = assessment.get("readiness_score", 0)
 
-            logger.info(f"Resume analysis complete for {user_id}: readiness={readiness}")
-            return {
-                "success": True,
-                "analysis": analysis,
-                "intermediate_steps": len(result.get("intermediate_steps", [])),
-            }
-        else:
-            # Fallback: return raw output
-            return {
-                "success": True,
-                "analysis": {"summary": output, "readiness_score": 0},
-                "raw_output": output,
-            }
+        analysis = {
+            "found_skills": found_skills,
+            "missing_skills": missing_skills,
+            "match_scores": jd_match.get("match_scores", {}),
+            "readiness_score": readiness_score,
+            "summary": assessment.get("summary", ""),
+            "strengths": assessment.get("strengths", []),
+            "critical_gaps": assessment.get("critical_gaps", []),
+            "recommended_actions": assessment.get("recommended_actions", []),
+            "skills_detail": skills_data,
+        }
+
+        # Save to Supabase
+        update_skill_profile(user_id, analysis)
+        update_readiness_score(user_id, readiness_score)
+
+        logger.info(f"Resume analysis complete for {user_id}: readiness={readiness_score}")
+        return {"success": True, "analysis": analysis}
 
     except Exception as e:
         logger.error(f"Resume analysis failed for {user_id}: {e}")
@@ -296,23 +287,4 @@ def _clean_json(text: str) -> str:
     end = text.rfind("}")
     if start != -1 and end != -1:
         return text[start: end + 1]
-
     return text
-
-
-def _extract_json(text: str) -> Optional[dict]:
-    """Extract JSON from agent output, handling various formats."""
-    # Direct parse
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        pass
-
-    # Try cleaning
-    try:
-        cleaned = _clean_json(text)
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        pass
-
-    return None
