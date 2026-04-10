@@ -72,14 +72,9 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"✗ Supabase connection failed: {e}")
 
-    # Pre-load Embeddings in background (Prevents port binding timeout on Render)
-    try:
-        from rag.retriever import _get_embeddings
-        import asyncio
-        logger.info("📡 Pre-loading Embeddings model in background...")
-        asyncio.create_task(asyncio.to_thread(_get_embeddings))
-    except Exception as e:
-        logger.warning(f"⚠ Embeddings pre-load failed or will load on demand: {e}")
+    # Pre-loading HuggingFace Embeddings was removed to prevent PyTorch from
+    # locking the GIL and hanging the server on low-vCPU Render free tiers.
+    # The embeddings will now lazy-load natively when the first AI coach prompt is triggered.
 
     try:
         from pinecone import Pinecone
