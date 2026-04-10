@@ -72,14 +72,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"✗ Supabase connection failed: {e}")
 
-    # Pre-load Embeddings (Prevents timeout on first RAG query)
+    # Pre-load Embeddings in background (Prevents port binding timeout on Render)
     try:
         from rag.retriever import _get_embeddings
-        logger.info("📡 Pre-loading Embeddings model...")
-        _get_embeddings()
-        logger.info("✓ Embeddings model pre-loaded")
+        import asyncio
+        logger.info("📡 Pre-loading Embeddings model in background...")
+        asyncio.create_task(asyncio.to_thread(_get_embeddings))
     except Exception as e:
-        logger.warning(f"⚠ Embeddings pre-load failed (will load on demand): {e}")
+        logger.warning(f"⚠ Embeddings pre-load failed or will load on demand: {e}")
 
     try:
         from pinecone import Pinecone

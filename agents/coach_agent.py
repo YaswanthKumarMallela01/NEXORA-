@@ -82,7 +82,7 @@ def _auto_assign_tasks(user_id: str, response_text: str):
                     try:
                         create_task({
                             "user_id": user_id,
-                            "title": task_text[:100],
+                            "title": task_text,
                             "due_date": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
                             "assigned_by": "coach",
                         })
