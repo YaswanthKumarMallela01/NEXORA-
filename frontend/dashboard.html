@@ -26,34 +26,40 @@
             background-size: 100% 100%, 32px 32px;
         }
 
-        /* ── Glass Sidebar ── */
+        /* ── Premium Glass Sidebar ── */
         .sidebar {
-            width: 260px; height: 100vh; background: var(--surface-solid);
-            border-right: 1px solid var(--outline); padding: 32px 20px;
+            width: 280px; height: 100vh; background: rgba(13, 17, 30, 0.55);
+            backdrop-filter: blur(28px); border-right: 1px solid rgba(255,255,255,0.06); padding: 36px 24px;
             display: flex; flex-direction: column; position: fixed; left: 0; top: 0; z-index: 100;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.25);
         }
-        .sidebar .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 48px; padding: 0 10px; }
+        .sidebar .brand { display: flex; align-items: center; gap: 16px; margin-bottom: 54px; padding: 0 10px; }
         .sidebar .brand-icon {
-            width: 44px; height: 44px; border-radius: 14px;
+            width: 48px; height: 48px; border-radius: 16px;
             background: linear-gradient(135deg, var(--primary-container), #4f46e5);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 8px 24px var(--primary-glow);
+            box-shadow: 0 8px 24px var(--primary-glow); border: 1px solid rgba(255,255,255,0.1);
         }
-        .sidebar .brand h2 { font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
-        .sidebar .brand small { display: block; font-family: 'Space Grotesk'; font-size: 0.6rem; color: var(--secondary); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; }
+        .sidebar .brand h2 { font-size: 1.35rem; font-weight: 900; color: #fff; letter-spacing: -0.02em; text-shadow: 0 0 20px var(--primary-glow); }
+        .sidebar .brand small { display: block; font-family: 'Space Grotesk'; font-size: 0.65rem; color: var(--secondary); letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800; }
         
         .nav-item {
-            display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 12px;
-            font-size: 0.9rem; font-weight: 500; color: var(--on-surface-variant);
-            cursor: pointer; transition: all 0.3s; text-decoration: none; margin-bottom: 4px; border: 1px solid transparent;
+            display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-radius: 16px;
+            font-size: 0.95rem; font-weight: 600; color: var(--on-surface-variant);
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; margin-bottom: 8px; border: 1px solid transparent;
+            position: relative; overflow: hidden;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.03); color: #fff; transform: translateX(4px); }
-        .nav-item.active { background: rgba(99,102,241,0.1); color: var(--primary); border-color: rgba(99,102,241,0.2); font-weight: 600; }
+        .nav-item::before { content:''; position:absolute; left:0; top:0; height:100%; width:0%; background: linear-gradient(90deg, rgba(99,102,241,0.15), transparent); transition: 0.3s; z-index: 0; }
+        .nav-item:hover::before { width: 100%; }
+        .nav-item > * { position: relative; z-index: 1; }
+        .nav-item:hover { color: #fff; transform: translateX(6px); border-color: rgba(255,255,255,0.05); }
+        .nav-item.active { background: rgba(99,102,241,0.15); color: #fff; border-color: rgba(99,102,241,0.3); font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+        .nav-item.active::after { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:4px; height:20px; background:var(--secondary); border-radius: 0 4px 4px 0; box-shadow: 0 0 10px var(--secondary); }
         .nav-section-label { font-family: 'Space Grotesk'; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: rgba(148,163,184,0.4); margin: 24px 0 12px 16px; letter-spacing: 0.1em; }
 
         /* ── Main Layout ── */
-        .main { margin-left: 260px; flex: 1; padding: 48px 64px 80px; min-height: 100vh; position: relative; }
+        .main { margin-left: 280px; flex: 1; padding: 48px 64px 80px; min-height: 100vh; position: relative; }
         
         /* ── Header ── */
         .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 48px; min-height: 100px; }
@@ -107,13 +113,13 @@
         .matrix-val { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--on-surface-variant); width: 24px; text-align: right; }
         @keyframes matrixGrow { from { width: 0; } to { width: var(--p); } }
 
-        /* ── Job Openings ── */
-        .job-card { background: rgba(255,255,255,0.02); border: 1px solid var(--outline); border-radius: 16px; padding: 20px; margin-bottom: 12px; transition: all 0.3s; border-left-width: 4px; border-left-color: var(--primary); display: block; text-decoration: none; color: inherit; }
-        .job-card:hover { transform: scale(1.02); background: rgba(255,255,255,0.04); border-color: var(--primary); }
-        .job-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .job-title { font-weight: 700; font-size: 0.95rem; }
-        .job-match { font-size: 0.7rem; font-weight: 700; background: rgba(45,212,191,0.1); color: var(--secondary); padding: 2px 8px; border-radius: 4px; }
-        .job-meta { font-size: 0.75rem; color: var(--on-surface-variant); display: flex; gap: 12px; }
+        .job-card { background: rgba(255,255,255,0.02); border: 1px solid var(--outline); border-radius: 16px; padding: 22px; margin-bottom: 16px; transition: all 0.3s; border-left-width: 4px; border-left-color: var(--primary); display: block; text-decoration: none; color: inherit; position: relative; }
+        .job-card:hover { transform: scale(1.02); background: rgba(255,255,255,0.06); border-color: var(--secondary); border-left-color: var(--secondary); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .job-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .job-title { font-weight: 800; font-size: 1rem; color: #fff; }
+        .job-match { font-size: 0.75rem; font-weight: 800; background: rgba(45,212,191,0.15); color: var(--secondary); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(45,212,191,0.3); }
+        .job-meta { font-size: 0.8rem; color: var(--on-surface-variant); display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+        .job-source { font-size: 0.75rem; color: var(--primary); font-family: 'JetBrains Mono'; font-weight: 600; margin-bottom: 12px; display: block; }
 
         /* ── Radar ── */
         .radar-box { position: relative; width: 100%; height: 280px; }
@@ -366,10 +372,11 @@
             const jobs = jobsData.jobs || [];
             if(jobs.length > 0) {
                 jobsContainer.innerHTML = jobs.map(j => `
-                    <a href="${j.url}" class="job-card">
+                    <a href="${j.url}" target="_blank" class="job-card">
                         <div class="job-header"><span class="job-title">${j.title}</span><span class="job-match">${j.match_score}% Match</span></div>
-                        <div style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">${j.company}</div>
-                        <div class="job-meta"><span>📍 ${j.location}</span><span>🔗 Full-time</span></div>
+                        <div style="font-size:0.85rem;font-weight:700;margin-bottom:6px;color:#cbd5e1;">🏢 ${j.company}</div>
+                        <span class="job-source">${j.description}</span>
+                        <div class="job-meta"><span>📍 ${j.location}</span><span>🔗 Open Platform Listing</span></div>
                     </a>
                 `).join('');
             } else {

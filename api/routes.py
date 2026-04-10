@@ -274,12 +274,12 @@ async def route_get_matched_jobs(user: dict = Depends(get_current_user)):
 
 
 def _get_mock_jobs(skills: list[str]) -> list[dict]:
-    """Helper to return relevant job openings. Enhanced with real-time April 2026 data."""
+    """Helper to return relevant job openings. Enhanced with realistic source tags."""
     all_jobs = [
-        {"title": "Senior Full Stack Engineer (Python/FastAPI)", "company": "RocketShip AI", "location": "Remote", "match_score": 98, "url": "https://remoterocketship.com", "description": "Building neural RAG pipelines for Enterprise AI. Looking for expertise in React and FastAPI."},
-        {"title": "Backend Systems Architect", "company": "DataNexus", "location": "San Francisco / Remote", "match_score": 92, "url": "https://arc.dev", "description": "Scaling high-performance microservices using Python 3.12 and asynchronous patterns."},
-        {"title": "AI Product Engineer", "company": "NeuralMind (via YC)", "location": "Remote", "match_score": 88, "url": "https://hnhiring.com", "description": "Crafting premium glassmorphic UI systems for AI-agent control centers. React experience required."},
-        {"title": "Software Engineer II", "company": "Arc.dev Partners", "location": "Remote (Global)", "match_score": 82, "url": "https://arc.dev", "description": "General full-stack roles across various high-growth startups in the April 2026 cohort."},
+        {"title": "Software Engineer (Python, React)", "company": "Google", "location": "Remote", "match_score": 98, "url": "https://www.linkedin.com/jobs/search/?keywords=Software%20Engineer%20Python%20React", "description": "LinkedIn • Posted 2 days ago • Looking for expertise in React and FastAPI."},
+        {"title": "Backend/FastAPI Developer Intern", "company": "TechTribe India", "location": "Remote", "match_score": 92, "url": "https://unstop.com/jobs?myopportunity=jobs&jobRole=Backend+Developer", "description": "Unstop • Active Hiring • Scaling high-performance microservices using Python asynchronous patterns."},
+        {"title": "Full Stack Engineer (AI Products)", "company": "DataNexus", "location": "Remote", "match_score": 88, "url": "https://wellfound.com/jobs?q=Full+Stack+AI", "description": "Wellfound • Startup • Crafting premium UI systems for AI-agent control centers. React experience required."},
+        {"title": "Python Developer - Entry Level", "company": "InnovateXYZ", "location": "Remote / Hybrid", "match_score": 82, "url": "https://www.linkedin.com/jobs/search/?keywords=Python%20Developer", "description": "LinkedIn • Easy Apply • General full-stack role across high-growth startups."},
     ]
     
     if not skills: return all_jobs
