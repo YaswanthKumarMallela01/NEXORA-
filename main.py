@@ -3,7 +3,7 @@ NEXORA — Main Application Entry Point
 FastAPI server with multi-agent AI, RAG pipeline, Supabase integration,
 and Stitch-generated Neural Minimalism frontend.
 
-Run locally:  .venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000
+Run locally:  .venv\\Scripts\\python.exe -m uvicorn main:app --reload --port 8000
 Deploy:        Render.com (see render.yaml / Procfile)
 """
 
@@ -71,6 +71,15 @@ async def lifespan(app: FastAPI):
         logger.info("✓ Supabase client initialized")
     except Exception as e:
         logger.error(f"✗ Supabase connection failed: {e}")
+
+    # Pre-load Embeddings (Prevents timeout on first RAG query)
+    try:
+        from rag.retriever import _get_embeddings
+        logger.info("📡 Pre-loading Embeddings model...")
+        _get_embeddings()
+        logger.info("✓ Embeddings model pre-loaded")
+    except Exception as e:
+        logger.warning(f"⚠ Embeddings pre-load failed (will load on demand): {e}")
 
     try:
         from pinecone import Pinecone
